@@ -5,16 +5,17 @@
     </header>
 
     <ScoreDisplay />
-    <BoxScore />
     <QuarterSelector />
 
     <div class="main-content">
       <PlayerRoster :selectedPlayerId="selectedPlayerId" @player-selected="handlePlayerSelected" />
       <StatsControlPanel @stat-clicked="handleStatClicked" />
-      <QuarterLogs @action-reverted="handleActionReverted" />
+      <QuarterLogs @action-reverted="handleActionReverted" @undo="handleUndo" />
     </div>
 
-    <ActionBar @undo="handleUndo" @save="handleSave" @export="handleExport" />
+    <ActionBar @box-score="handleBoxScore" @save="handleSave" @export="handleExport" />
+
+    <BoxScore :show="showBoxScore" @close="handleBoxScoreClose" />
 
     <PlayerSelectionModal
       v-if="showPlayerModal"
@@ -58,6 +59,7 @@ export default {
   setup() {
     const selectedPlayerId = ref(null)
     const showPlayerModal = ref(false)
+    const showBoxScore = ref(false)
     const pendingStatType = ref(null)
     const pendingStatLabel = ref('')
     const notification = ref(null)
@@ -125,9 +127,18 @@ export default {
       showNotification('Action reverted successfully')
     }
 
+    function handleBoxScore() {
+      showBoxScore.value = true
+    }
+
+    function handleBoxScoreClose() {
+      showBoxScore.value = false
+    }
+
     return {
       selectedPlayerId,
       showPlayerModal,
+      showBoxScore,
       pendingStatType,
       pendingStatLabel,
       notification,
@@ -138,7 +149,9 @@ export default {
       handleUndo,
       handleSave,
       handleExport,
-      handleActionReverted
+      handleActionReverted,
+      handleBoxScore,
+      handleBoxScoreClose
     }
   }
 }

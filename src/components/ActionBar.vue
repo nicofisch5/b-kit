@@ -1,8 +1,8 @@
 <template>
   <div class="action-bar">
-    <button class="action-btn undo-btn" @click="handleUndo">
-      <span class="btn-icon">↶</span>
-      Undo Last
+    <button class="action-btn box-score-btn" @click="handleBoxScore">
+      <span class="btn-icon">📊</span>
+      Box Score
     </button>
 
     <button class="action-btn save-btn" @click="handleSave">
@@ -39,12 +39,12 @@ import { resetGame } from '../store/gameStore'
 
 export default {
   name: 'ActionBar',
-  emits: ['undo', 'save', 'export'],
+  emits: ['box-score', 'save', 'export'],
   setup(props, { emit }) {
     const showExportMenu = ref(false)
 
-    function handleUndo() {
-      emit('undo')
+    function handleBoxScore() {
+      emit('box-score')
     }
 
     function handleSave() {
@@ -69,7 +69,7 @@ export default {
 
     return {
       showExportMenu,
-      handleUndo,
+      handleBoxScore,
       handleSave,
       toggleExportMenu,
       handleExport,

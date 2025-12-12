@@ -1,7 +1,5 @@
 <template>
-  <div class="box-score-container">
-    <button class="box-score-btn" @click="showModal = true">Box Score</button>
-
+  <div>
     <div v-if="showModal" class="modal-overlay" @click="closeModal">
       <div class="box-score-modal" @click.stop>
         <div class="modal-header">
@@ -68,16 +66,28 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { gameState, StatType } from '../store/gameStore'
 
 export default {
   name: 'BoxScore',
-  setup() {
-    const showModal = ref(false)
+  props: {
+    show: {
+      type: Boolean,
+      default: false
+    }
+  },
+  emits: ['close'],
+  setup(props, { emit }) {
+    const showModal = ref(props.show)
+
+    watch(() => props.show, (newVal) => {
+      showModal.value = newVal
+    })
 
     function closeModal() {
       showModal.value = false
+      emit('close')
     }
 
     const playerStats = computed(() => {

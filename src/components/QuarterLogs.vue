@@ -1,8 +1,14 @@
 <template>
   <div class="quarter-logs">
     <div class="logs-header">
-      <h2 class="logs-title">{{ currentQuarterName }} Logs</h2>
-      <span class="logs-count">{{ logs.length }} action{{ logs.length !== 1 ? 's' : '' }}</span>
+      <div class="logs-header-left">
+        <h2 class="logs-title">{{ currentQuarterName }} Logs</h2>
+        <span class="logs-count">{{ logs.length }} action{{ logs.length !== 1 ? 's' : '' }}</span>
+      </div>
+      <button class="undo-last-btn" @click="handleUndo" title="Undo last action">
+        <span class="btn-icon">↶</span>
+        Undo Last
+      </button>
     </div>
     <div class="logs-list">
       <div v-if="logs.length === 0" class="no-logs">
@@ -34,11 +40,11 @@
 
 <script>
 import { computed } from 'vue'
-import { gameState, getCurrentQuarter, revertStatEvent, StatType } from '../store/gameStore'
+import { gameState, getCurrentQuarter, revertStatEvent, undoLastAction, StatType } from '../store/gameStore'
 
 export default {
   name: 'QuarterLogs',
-  emits: ['action-reverted'],
+  emits: ['action-reverted', 'undo'],
   setup(props, { emit }) {
     const currentQuarterName = computed(() => gameState.currentQuarter)
 
@@ -104,13 +110,18 @@ export default {
       }
     }
 
+    function handleUndo() {
+      emit('undo')
+    }
+
     return {
       currentQuarterName,
       logs,
       formatStatType,
       getStatClass,
       formatTime,
-      revertAction
+      revertAction,
+      handleUndo
     }
   }
 }

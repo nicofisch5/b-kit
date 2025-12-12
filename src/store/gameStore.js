@@ -363,30 +363,41 @@ export function exportJSON() {
 
 // Export game data as CSV
 export function exportCSV() {
-  let csv = 'Player,Jersey Number,Total Points,Total Fouls'
-
-  // Add quarter columns for each stat type
-  const statTypes = Object.keys(StatType)
-  gameState.quarters.forEach(quarter => {
-    statTypes.forEach(type => {
-      csv += `,${quarter.quarterName} ${type.replace(/_/g, ' ')}`
-    })
-  })
-  csv += '\n'
+  // Box score format header
+  let csv = '#,Name,PTS,FGM,FGA,FG%,3PM,3PA,3P%,FTM,FTA,FT%,OREB,DREB,REB,AST,STL,BLK,TO,PF\n'
 
   // Add player data
   gameState.players.forEach(player => {
-    csv += `${player.name},${player.jerseyNumber},${player.totalPoints},${player.totalFouls}`
+    const stats = player.statistics
 
-    gameState.quarters.forEach(quarter => {
-      statTypes.forEach(type => {
-        const count = player.statistics.filter(s =>
-          s.quarterId === quarter.quarterId && s.statType === StatType[type]
-        ).length
-        csv += `,${count}`
-      })
-    })
-    csv += '\n'
+    // Count each stat type
+    const twoMade = stats.filter(s => s.statType === StatType.TWO_PT_MADE).length
+    const twoMiss = stats.filter(s => s.statType === StatType.TWO_PT_MISS).length
+    const threeMade = stats.filter(s => s.statType === StatType.THREE_PT_MADE).length
+    const threeMiss = stats.filter(s => s.statType === StatType.THREE_PT_MISS).length
+    const ftMade = stats.filter(s => s.statType === StatType.FT_MADE).length
+    const ftMiss = stats.filter(s => s.statType === StatType.FT_MISS).length
+    const offReb = stats.filter(s => s.statType === StatType.OFF_REB).length
+    const defReb = stats.filter(s => s.statType === StatType.DEF_REB).length
+    const assists = stats.filter(s => s.statType === StatType.ASSIST).length
+    const steals = stats.filter(s => s.statType === StatType.STEAL).length
+    const blocks = stats.filter(s => s.statType === StatType.BLOCK).length
+    const turnovers = stats.filter(s => s.statType === StatType.TURNOVER).length
+
+    // Calculate derived stats
+    const FGM = twoMade + threeMade
+    const FGA = twoMade + twoMiss + threeMade + threeMiss
+    const FGP = FGA > 0 ? ((FGM / FGA) * 100).toFixed(1) + '%' : '0.0%'
+
+    const TPA = threeMade + threeMiss
+    const TPP = TPA > 0 ? ((threeMade / TPA) * 100).toFixed(1) + '%' : '0.0%'
+
+    const FTA = ftMade + ftMiss
+    const FTP = FTA > 0 ? ((ftMade / FTA) * 100).toFixed(1) + '%' : '0.0%'
+
+    const REB = offReb + defReb
+
+    csv += `${player.jerseyNumber},${player.name},${player.totalPoints},${FGM},${FGA},${FGP},${threeMade},${TPA},${TPP},${ftMade},${FTA},${FTP},${offReb},${defReb},${REB},${assists},${steals},${blocks},${turnovers},${player.totalFouls}\n`
   })
 
   const blob = new Blob([csv], { type: 'text/csv' })
