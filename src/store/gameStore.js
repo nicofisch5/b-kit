@@ -436,6 +436,27 @@ export function exportCSV() {
   URL.revokeObjectURL(url)
 }
 
+// Import game from JSON
+export function importGame(jsonData) {
+  try {
+    const importedGame = JSON.parse(jsonData)
+
+    // Validate imported data has required structure
+    if (!importedGame.gameId || !importedGame.players || !importedGame.quarters) {
+      return { success: false, message: 'Invalid game file format' }
+    }
+
+    // Replace current game state with imported data
+    Object.assign(gameState, importedGame)
+    saveGame()
+
+    return { success: true, message: 'Game imported successfully' }
+  } catch (error) {
+    console.error('Error importing game:', error)
+    return { success: false, message: 'Failed to parse game file' }
+  }
+}
+
 // Reset game
 export function resetGame(keepPlayers = false) {
   let players

@@ -14,7 +14,7 @@
       <QuarterLogs @action-reverted="handleActionReverted" @undo="handleUndo" />
     </div>
 
-    <ActionBar @box-score="handleBoxScore" @save="handleSave" @export="handleExport" />
+    <ActionBar @box-score="handleBoxScore" @save="handleSave" @export="handleExport" @import="handleImport" />
 
     <BoxScore :show="showBoxScore" @close="handleBoxScoreClose" />
 
@@ -46,7 +46,7 @@ import PlayerSelectionModal from './components/PlayerSelectionModal.vue'
 import ActionBar from './components/ActionBar.vue'
 import QuarterLogs from './components/QuarterLogs.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
-import { undoLastAction, saveGame, exportJSON, exportCSV } from './store/gameStore'
+import { undoLastAction, saveGame, exportJSON, exportCSV, importGame } from './store/gameStore'
 
 export default {
   name: 'App',
@@ -128,6 +128,17 @@ export default {
       }
     }
 
+    function handleImport(jsonData) {
+      const result = importGame(jsonData)
+      if (result.success) {
+        showNotification(result.message)
+        // Refresh the page state by clearing any selected player
+        selectedPlayerId.value = null
+      } else {
+        showNotification(result.message, 'error')
+      }
+    }
+
     function handleActionReverted() {
       showNotification('Action reverted successfully')
     }
@@ -154,6 +165,7 @@ export default {
       handleUndo,
       handleSave,
       handleExport,
+      handleImport,
       handleActionReverted,
       handleBoxScore,
       handleBoxScoreClose
