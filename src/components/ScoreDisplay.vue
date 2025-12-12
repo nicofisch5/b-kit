@@ -1,7 +1,7 @@
 <template>
   <div class="score-display-compact">
     <div class="score-item-compact">
-      <span class="team-label-compact">Home Team</span>
+      <span class="team-label-compact">{{ homeTeamName }}</span>
       <span class="score-value-compact">{{ homeScore }}</span>
     </div>
 
@@ -9,7 +9,7 @@
 
     <div class="score-item-compact">
       <span class="score-value-compact">{{ oppositionScoreLocal }}</span>
-      <span class="team-label-compact">Opposition</span>
+      <span class="team-label-compact">{{ oppositionTeamName }}</span>
     </div>
 
     <div class="score-controls-compact">
@@ -29,6 +29,8 @@ export default {
     const oppositionScoreLocal = ref(gameState.oppositionScore)
 
     const homeScore = computed(() => getTotalHomeScore())
+    const homeTeamName = computed(() => gameState.homeTeam)
+    const oppositionTeamName = computed(() => gameState.oppositionTeam)
 
     watch(
       () => gameState.oppositionScore,
@@ -55,6 +57,8 @@ export default {
 
     return {
       homeScore,
+      homeTeamName,
+      oppositionTeamName,
       oppositionScoreLocal,
       incrementOpposition,
       decrementOpposition,
