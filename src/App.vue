@@ -1,6 +1,7 @@
 <template>
   <div id="app" class="app-container">
     <header class="app-header">
+      <img src="/b-Strack_logo-t.png" alt="B-Strack Logo" class="app-logo" />
       <h1 class="app-title">B-Strack</h1>
     </header>
 
@@ -29,6 +30,8 @@
     <div v-if="notification" class="notification" :class="notification.type">
       {{ notification.message }}
     </div>
+
+    <ThemeToggle />
   </div>
 </template>
 
@@ -42,6 +45,7 @@ import StatsControlPanel from './components/StatsControlPanel.vue'
 import PlayerSelectionModal from './components/PlayerSelectionModal.vue'
 import ActionBar from './components/ActionBar.vue'
 import QuarterLogs from './components/QuarterLogs.vue'
+import ThemeToggle from './components/ThemeToggle.vue'
 import { undoLastAction, saveGame, exportJSON, exportCSV } from './store/gameStore'
 
 export default {
@@ -54,7 +58,8 @@ export default {
     StatsControlPanel,
     PlayerSelectionModal,
     ActionBar,
-    QuarterLogs
+    QuarterLogs,
+    ThemeToggle
   },
   setup() {
     const selectedPlayerId = ref(null)

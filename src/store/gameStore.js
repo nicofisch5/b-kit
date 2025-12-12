@@ -382,7 +382,8 @@ export function exportJSON() {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `basketball-game-${new Date().toISOString().split('T')[0]}.json`
+  const gameId = gameState.gameId.substring(0, 8)
+  a.download = `b-strack-${gameId}-${new Date().toISOString().split('T')[0]}.json`
   a.click()
   URL.revokeObjectURL(url)
 }

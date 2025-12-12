@@ -66,26 +66,14 @@ body {
 
 .app-header {
   text-align: center;
-  margin-bottom: var(--spacing-md);
-  padding: var(--spacing-sm) 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--spacing-xs);
-}
-
-.app-logo {
-  max-width: 120px;
-  height: auto;
+  margin-bottom: var(--spacing-lg);
 }
 
 .app-title {
-  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
   font-weight: 700;
   color: var(--text-light);
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-  margin: 0;
-  display: none;
 }
 
 /* ===== Score Display Compact ===== */
@@ -1038,17 +1026,7 @@ body {
   }
 
   .app-header {
-    padding: var(--spacing-xs) 0;
-    margin-bottom: var(--spacing-sm);
-    gap: 2px;
-  }
-
-  .app-logo {
-    max-width: 80px;
-  }
-
-  .app-title {
-    font-size: clamp(1rem, 2.5vw, 1.4rem);
+    padding: var(--spacing-md) var(--spacing-sm);
   }
 
   .score-display-compact {
@@ -1114,12 +1092,8 @@ body {
 
 /* Small Mobile */
 @media (max-width: 480px) {
-  .app-logo {
-    max-width: 60px;
-  }
-
   .app-title {
-    font-size: 1rem;
+    font-size: 1.3rem;
   }
 
   .score-value-compact {
@@ -1291,205 +1265,3 @@ input:focus-visible {
     max-width: 100%;
   }
 }
-
-/* ===== TERMINAL THEME OVERRIDES ===== */
-[data-theme="terminal"] {
-  --bg-color: #f5f5f5;
-  --text-color: #000000;
-  --border-color: #999999;
-  --highlight-bg: #666666;
-  --highlight-text: #ffffff;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 16px;
-  --spacing-lg: 24px;
-  --spacing-xl: 32px;
-}
-
-[data-theme="terminal"] body {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  line-height: 1.4;
-  font-size: 14px;
-}
-
-/* Remove all rounded corners and shadows in terminal mode */
-[data-theme="terminal"] .app-header,
-[data-theme="terminal"] .score-display-compact,
-[data-theme="terminal"] .quarter-selector,
-[data-theme="terminal"] .player-roster,
-[data-theme="terminal"] .stats-control-panel,
-[data-theme="terminal"] .quarter-logs,
-[data-theme="terminal"] .action-bar,
-[data-theme="terminal"] .modal-content,
-[data-theme="terminal"] .box-score-modal,
-[data-theme="terminal"] .notification {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-color);
-}
-
-[data-theme="terminal"] .quarter-btn,
-[data-theme="terminal"] .stat-btn,
-[data-theme="terminal"] .action-btn,
-[data-theme="terminal"] .score-btn-compact,
-[data-theme="terminal"] .player-select-btn,
-[data-theme="terminal"] .assist-option-btn,
-[data-theme="terminal"] .modal-btn,
-[data-theme="terminal"] .close-btn,
-[data-theme="terminal"] .delete-icon-btn,
-[data-theme="terminal"] .edit-icon-btn,
-[data-theme="terminal"] .toggle-section-btn,
-[data-theme="terminal"] .undo-last-btn,
-[data-theme="terminal"] .log-revert-btn,
-[data-theme="terminal"] .export-option {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: bold;
-}
-
-[data-theme="terminal"] .quarter-btn.add-ot {
-  border: 2px dashed var(--border-color);
-}
-
-[data-theme="terminal"] .quarter-btn:hover,
-[data-theme="terminal"] .stat-btn:hover,
-[data-theme="terminal"] .action-btn:hover,
-[data-theme="terminal"] .score-btn-compact:hover,
-[data-theme="terminal"] .player-select-btn:hover:not(:disabled),
-[data-theme="terminal"] .assist-option-btn:hover,
-[data-theme="terminal"] .modal-btn:hover,
-[data-theme="terminal"] .close-btn:hover,
-[data-theme="terminal"] .delete-icon-btn:hover,
-[data-theme="terminal"] .edit-icon-btn:hover,
-[data-theme="terminal"] .toggle-section-btn:hover,
-[data-theme="terminal"] .undo-last-btn:hover,
-[data-theme="terminal"] .log-revert-btn:hover,
-[data-theme="terminal"] .export-option:hover {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-  transform: none;
-  box-shadow: none;
-}
-
-[data-theme="terminal"] .player-card,
-[data-theme="terminal"] .log-item {
-  border-radius: 0;
-  box-shadow: none;
-  border: 1px solid var(--border-color);
-}
-
-[data-theme="terminal"] .player-card:hover,
-[data-theme="terminal"] .log-item:hover {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-  transform: none;
-}
-
-[data-theme="terminal"] .player-card.selected {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-  border: 2px solid var(--border-color);
-}
-
-[data-theme="terminal"] .quarter-btn.active {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-  border: 2px solid var(--border-color);
-}
-
-[data-theme="terminal"] .app-logo {
-  display: none;
-}
-
-[data-theme="terminal"] .app-title {
-  display: block;
-  color: var(--text-color);
-  text-shadow: none;
-  font-weight: bold;
-  letter-spacing: 2px;
-}
-
-[data-theme="terminal"] .team-label-compact,
-[data-theme="terminal"] .score-value-compact,
-[data-theme="terminal"] .score-separator-compact {
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .player-number,
-[data-theme="terminal"] .player-number-large {
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .player-select-btn:hover:not(:disabled) .player-number-large,
-[data-theme="terminal"] .player-select-btn:hover:not(:disabled) .player-name-small {
-  color: var(--highlight-text);
-}
-
-[data-theme="terminal"] .box-score-table thead {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-}
-
-[data-theme="terminal"] .box-score-table tbody tr:hover {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-}
-
-[data-theme="terminal"] .export-menu {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--border-color);
-}
-
-[data-theme="terminal"] .form-group input {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: 'Courier New', Courier, monospace;
-}
-
-[data-theme="terminal"] .logs-count {
-  border-radius: 0;
-  box-shadow: none;
-  border: 1px solid var(--border-color);
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .log-stat {
-  border-radius: 0;
-  border: 1px solid var(--border-color);
-}
-
-[data-theme="terminal"] .app-container {
-  max-width: 1200px;
-}
-
-/* Terminal theme - remove all color-coded elements */
-[data-theme="terminal"] .stat-btn.made,
-[data-theme="terminal"] .stat-btn.miss,
-[data-theme="terminal"] .stat-btn.neutral,
-[data-theme="terminal"] .stat-btn.positive,
-[data-theme="terminal"] .stat-btn.negative {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .stat-btn.made:hover,
-[data-theme="terminal"] .stat-btn.miss:hover,
-[data-theme="terminal"] .stat-btn.neutral:hover,
-[data-theme="terminal"] .stat-btn.positive:hover,
-[data-theme="terminal"] .stat-btn.negative:hover {
-  background-color: var(--highlight-bg);
-  color: var(--highlight-text);
-}
-
