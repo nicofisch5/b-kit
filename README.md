@@ -7,11 +7,15 @@ A Progressive Web App for tracking basketball game statistics in real-time. Buil
 ### Core Functionality
 - **Real-time Score Tracking**: Automatic score calculation for home team based on recorded stats
 - **Quarter Management**: Full support for Q1, Q2, Q3, Q4, and unlimited overtime periods
-- **Player Statistics**: Track comprehensive stats for up to 12 players
+- **Player Statistics**: Track comprehensive stats for up to 12 players (minimum 5 players)
 - **Offline Support**: PWA capabilities allow the app to work without internet connection
 - **Auto-Save**: Game data automatically saved to localStorage every 30 seconds
 - **Undo Functionality**: Revert the last recorded action
-- **Data Export**: Export game statistics to JSON or CSV formats
+- **Data Export**: Export game statistics to JSON or CSV formats with gameId in filename
+- **Data Import**: Import previously exported JSON game files to restore game state
+- **Box Score**: Comprehensive statistics table with professional box score format
+- **Player Management**: Edit player names/jersey numbers, delete players (minimum 5 required)
+- **Theme Toggle**: Switch between Modern (colorful) and Terminal (monospace, grey borders) themes
 
 ### Statistics Tracked
 - **Scoring**: 2PT Made/Miss, 3PT Made/Miss, FT Made/Miss
