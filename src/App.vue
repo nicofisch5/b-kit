@@ -5,6 +5,7 @@
     </header>
 
     <ScoreDisplay />
+    <BoxScore />
     <QuarterSelector />
 
     <div class="main-content">
@@ -33,6 +34,7 @@
 <script>
 import { ref } from 'vue'
 import ScoreDisplay from './components/ScoreDisplay.vue'
+import BoxScore from './components/BoxScore.vue'
 import QuarterSelector from './components/QuarterSelector.vue'
 import PlayerRoster from './components/PlayerRoster.vue'
 import StatsControlPanel from './components/StatsControlPanel.vue'
@@ -45,6 +47,7 @@ export default {
   name: 'App',
   components: {
     ScoreDisplay,
+    BoxScore,
     QuarterSelector,
     PlayerRoster,
     StatsControlPanel,

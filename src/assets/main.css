@@ -67,10 +67,7 @@ body {
 .app-header {
   text-align: center;
   padding: var(--spacing-lg) 0;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-  border-radius: var(--radius-lg);
   margin-bottom: var(--spacing-lg);
-  box-shadow: var(--shadow-md);
 }
 
 .app-title {
@@ -121,12 +118,14 @@ body {
   letter-spacing: 1px;
   margin-bottom: var(--spacing-sm);
   opacity: 0.9;
+  color: white;
 }
 
 .score {
   font-size: clamp(2.5rem, 6vw, 4rem);
   font-weight: 700;
   line-height: 1;
+  color: white;
 }
 
 .score-separator {
@@ -1101,6 +1100,97 @@ button:focus-visible,
 input:focus-visible {
   outline: 3px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* ===== Box Score ===== */
+.box-score-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: var(--spacing-lg);
+}
+
+.box-score-btn {
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: 1.1rem;
+  font-weight: 600;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.box-score-btn:hover {
+  background-color: #e55f2e;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.box-score-modal {
+  background-color: var(--bg-light);
+  border-radius: var(--radius-lg);
+  max-width: 95vw;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  animation: slideUp 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-container {
+  overflow-x: auto;
+  overflow-y: auto;
+  max-height: calc(90vh - 80px);
+}
+
+.box-score-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.box-score-table thead {
+  position: sticky;
+  top: 0;
+  background-color: var(--primary-color);
+  color: white;
+  z-index: 10;
+}
+
+.box-score-table th {
+  padding: var(--spacing-md);
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  white-space: nowrap;
+}
+
+.box-score-table td {
+  padding: var(--spacing-sm) var(--spacing-md);
+  text-align: center;
+  border: 1px solid var(--border-color);
+}
+
+.box-score-table tbody tr:nth-child(odd) {
+  background-color: var(--bg-card);
+}
+
+.box-score-table tbody tr:nth-child(even) {
+  background-color: var(--bg-light);
+}
+
+.box-score-table tbody tr:hover {
+  background-color: rgba(255, 107, 53, 0.1);
+}
+
+.box-score-table .player-name-col {
+  text-align: left;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ===== Print Styles ===== */
