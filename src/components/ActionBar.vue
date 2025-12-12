@@ -13,7 +13,7 @@
     <div class="export-dropdown">
       <button class="action-btn export-btn" @click="toggleExportMenu">
         <span class="btn-icon">📊</span>
-        Export Stats
+        Export Game
         <span class="dropdown-arrow">▼</span>
       </button>
       <div v-if="showExportMenu" class="export-menu">
@@ -21,7 +21,7 @@
           Export as JSON
         </button>
         <button class="export-option" @click="handleExport('csv')">
-          Export as CSV
+          Export as Stats CSV
         </button>
       </div>
     </div>

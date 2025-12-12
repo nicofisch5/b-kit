@@ -725,6 +725,10 @@ body {
   background-color: var(--secondary-color);
 }
 
+.import-btn {
+  background-color: var(--error-color);
+}
+
 .reset-btn {
   background-color: var(--error-color);
 }
