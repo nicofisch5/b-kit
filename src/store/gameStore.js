@@ -344,6 +344,32 @@ export function updatePlayer(playerId, updates) {
   return true
 }
 
+// Delete a player (minimum 5 players required)
+export function deletePlayer(playerId) {
+  if (gameState.players.length <= 5) {
+    return { success: false, message: 'Cannot delete player. Minimum 5 players required.' }
+  }
+
+  const playerIndex = gameState.players.findIndex(p => p.playerId === playerId)
+  if (playerIndex === -1) {
+    return { success: false, message: 'Player not found.' }
+  }
+
+  // Remove the player
+  gameState.players.splice(playerIndex, 1)
+
+  // Remove player's statistics from all quarters
+  gameState.quarters.forEach(quarter => {
+    quarter.statistics = quarter.statistics.filter(stat => stat.playerId !== playerId)
+  })
+
+  // Remove player's actions from history
+  gameState.history = gameState.history.filter(entry => entry.playerId !== playerId)
+
+  saveGame()
+  return { success: true, message: 'Player deleted successfully.' }
+}
+
 // Calculate total home score
 export function getTotalHomeScore() {
   return gameState.players.reduce((sum, player) => sum + player.totalPoints, 0)

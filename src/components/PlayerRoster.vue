@@ -1,7 +1,12 @@
 <template>
   <div class="player-roster">
-    <h2 class="roster-title">Players</h2>
-    <div class="player-list">
+    <div class="roster-header">
+      <h2 class="roster-title">Players</h2>
+      <button class="toggle-section-btn" @click="isExpanded = !isExpanded" :title="isExpanded ? 'Hide players' : 'Show players'">
+        {{ isExpanded ? '▼' : '▶' }}
+      </button>
+    </div>
+    <div v-show="isExpanded" class="player-list">
       <div
         v-for="player in players"
         :key="player.playerId"
@@ -13,6 +18,9 @@
         }"
         @click="selectPlayer(player.playerId)"
       >
+        <button class="delete-icon-btn" @click.stop="confirmDeletePlayer(player)" title="Delete player">
+          <i class="material-icons">delete</i>
+        </button>
         <button class="edit-icon-btn" @click.stop="openEditModal(player)" title="Edit player">
           <i class="material-icons">edit</i>
         </button>
@@ -46,7 +54,7 @@
 
 <script>
 import { ref, computed } from 'vue'
-import { gameState } from '../store/gameStore'
+import { gameState, deletePlayer } from '../store/gameStore'
 import PlayerEditModal from './PlayerEditModal.vue'
 
 export default {
@@ -65,6 +73,7 @@ export default {
     const players = computed(() => gameState.players)
     const showEditModal = ref(false)
     const editingPlayer = ref(null)
+    const isExpanded = ref(true)
 
     function selectPlayer(playerId) {
       // Toggle selection: if already selected, deselect
@@ -90,6 +99,15 @@ export default {
       editingPlayer.value = null
     }
 
+    function confirmDeletePlayer(player) {
+      if (confirm(`Are you sure you want to delete ${player.name} (#${player.jerseyNumber})? This action cannot be undone.`)) {
+        const result = deletePlayer(player.playerId)
+        if (!result.success) {
+          alert(result.message)
+        }
+      }
+    }
+
     return {
       players,
       selectPlayer,
@@ -97,7 +115,9 @@ export default {
       editingPlayer,
       openEditModal,
       handleSave,
-      handleCancel
+      handleCancel,
+      confirmDeletePlayer,
+      isExpanded
     }
   }
 }

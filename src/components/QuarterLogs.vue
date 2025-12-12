@@ -5,12 +5,17 @@
         <h2 class="logs-title">{{ currentQuarterName }} Logs</h2>
         <span class="logs-count">{{ logs.length }} action{{ logs.length !== 1 ? 's' : '' }}</span>
       </div>
-      <button class="undo-last-btn" @click="handleUndo" title="Undo last action">
-        <span class="btn-icon">↶</span>
-        Undo Last
-      </button>
+      <div class="logs-header-right">
+        <button class="undo-last-btn" @click="handleUndo" title="Undo last action">
+          <span class="btn-icon">↶</span>
+          Undo Last
+        </button>
+        <button class="toggle-section-btn" @click="isExpanded = !isExpanded" :title="isExpanded ? 'Hide logs' : 'Show logs'">
+          {{ isExpanded ? '▼' : '▶' }}
+        </button>
+      </div>
     </div>
-    <div class="logs-list">
+    <div v-show="isExpanded" class="logs-list">
       <div v-if="logs.length === 0" class="no-logs">
         No actions recorded in this quarter yet
       </div>
@@ -39,7 +44,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { gameState, getCurrentQuarter, revertStatEvent, undoLastAction, StatType } from '../store/gameStore'
 
 export default {
@@ -47,6 +52,7 @@ export default {
   emits: ['action-reverted', 'undo'],
   setup(props, { emit }) {
     const currentQuarterName = computed(() => gameState.currentQuarter)
+    const isExpanded = ref(true)
 
     const logs = computed(() => {
       const quarter = getCurrentQuarter()
@@ -121,7 +127,8 @@ export default {
       getStatClass,
       formatTime,
       revertAction,
-      handleUndo
+      handleUndo,
+      isExpanded
     }
   }
 }

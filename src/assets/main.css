@@ -76,13 +76,13 @@ body {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-/* ===== Score Display ===== */
-.score-display {
+/* ===== Score Display Compact ===== */
+.score-display-compact {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: var(--spacing-xl);
-  padding: var(--spacing-lg);
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   background-color: var(--bg-light);
   border-radius: var(--radius-lg);
   margin-bottom: var(--spacing-lg);
@@ -90,96 +90,60 @@ body {
   flex-wrap: wrap;
 }
 
-.score-box {
-  text-align: center;
-  padding: var(--spacing-lg);
-  border-radius: var(--radius-md);
-  min-width: 150px;
-  min-height: 180px;
-  box-shadow: var(--shadow-sm);
+.score-item-compact {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
+  align-items: center;
+  gap: var(--spacing-sm);
 }
 
-.home-score {
-  background-color: var(--primary-color);
-}
-
-.opposition-score {
-  background-color: var(--secondary-color);
-}
-
-.team-label {
-  font-size: 0.9rem;
+.team-label-compact {
+  font-size: 1rem;
   font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: var(--spacing-sm);
-  opacity: 0.9;
-  color: white;
+  color: var(--text-light);
 }
 
-.score {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  font-weight: 700;
-  line-height: 1;
-  color: white;
-}
-
-.score-separator {
+.score-value-compact {
   font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  min-width: 40px;
+  text-align: center;
+}
+
+.score-separator-compact {
+  font-size: 1.8rem;
   font-weight: 300;
   color: var(--text-muted);
 }
 
-.score-controls {
+.score-controls-compact {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  justify-content: center;
-  margin-top: var(--spacing-sm);
+  gap: var(--spacing-xs);
 }
 
-.score-btn {
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  color: inherit;
-  font-size: 1.5rem;
-  width: 40px;
-  height: 40px;
+.score-btn-compact {
+  background-color: var(--secondary-color);
+  border: none;
+  color: white;
+  font-size: 1.3rem;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   cursor: pointer;
   transition: all var(--transition-fast);
   font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
-.score-btn:hover {
-  background-color: rgba(255, 255, 255, 1);
-  transform: scale(1.05);
+.score-btn-compact:hover {
+  background-color: #003d6b;
+  transform: scale(1.1);
+  box-shadow: var(--shadow-md);
 }
 
-.score-btn:active {
+.score-btn-compact:active {
   transform: scale(0.95);
-}
-
-.score-input {
-  width: 80px;
-  height: 40px;
-  text-align: center;
-  font-size: 1.5rem;
-  font-weight: 700;
-  background-color: rgba(255, 255, 255, 0.9);
-  border: 2px solid rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-sm);
-  color: inherit;
-  padding: var(--spacing-xs);
-}
-
-.score-input::-webkit-inner-spin-button,
-.score-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
 }
 
 /* ===== Quarter Selector ===== */
@@ -249,12 +213,19 @@ body {
   height: fit-content;
 }
 
+.roster-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--border-color);
+}
+
 .roster-title {
   font-size: 1.5rem;
-  margin-bottom: var(--spacing-md);
   color: var(--primary-color);
-  border-bottom: 2px solid var(--border-color);
-  padding-bottom: var(--spacing-sm);
+  margin: 0;
 }
 
 .player-list {
@@ -305,11 +276,11 @@ body {
   transition: all var(--transition-fast);
 }
 
+.delete-icon-btn,
 .edit-icon-btn {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background-color: var(--primary-color);
   color: white;
   border: none;
   cursor: pointer;
@@ -322,9 +293,23 @@ body {
   padding: 0;
 }
 
+.delete-icon-btn {
+  background-color: var(--error-color);
+}
+
+.delete-icon-btn:hover {
+  background-color: #a82333;
+  transform: scale(1.1);
+}
+
+.delete-icon-btn .material-icons,
 .edit-icon-btn .material-icons {
   font-size: 18px;
   line-height: 1;
+}
+
+.edit-icon-btn {
+  background-color: var(--primary-color);
 }
 
 .edit-icon-btn:hover {
@@ -491,6 +476,13 @@ body {
   flex-wrap: wrap;
 }
 
+.logs-header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
 .logs-title {
   font-size: 1.5rem;
   color: var(--primary-color);
@@ -530,6 +522,33 @@ body {
 
 .undo-last-btn .btn-icon {
   font-size: 1.1rem;
+}
+
+.toggle-section-btn {
+  background-color: var(--neutral-color);
+  color: white;
+  border: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 700;
+  transition: all var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.toggle-section-btn:hover {
+  background-color: var(--secondary-color);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-md);
+}
+
+.toggle-section-btn:active {
+  transform: scale(0.95);
 }
 
 .logs-list {
@@ -994,14 +1013,17 @@ body {
     padding: var(--spacing-md) var(--spacing-sm);
   }
 
-  .score-display {
-    flex-direction: column;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
+  .score-display-compact {
+    gap: var(--spacing-sm);
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
-  .score-separator {
-    display: none;
+  .score-value-compact {
+    font-size: 1.5rem;
+  }
+
+  .team-label-compact {
+    font-size: 0.85rem;
   }
 
   .quarter-selector {
@@ -1015,7 +1037,7 @@ body {
   }
 
   .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
   .player-grid {
@@ -1058,8 +1080,18 @@ body {
     font-size: 1.3rem;
   }
 
-  .score {
-    font-size: 2rem;
+  .score-value-compact {
+    font-size: 1.3rem;
+  }
+
+  .team-label-compact {
+    font-size: 0.75rem;
+  }
+
+  .score-btn-compact {
+    width: 32px;
+    height: 32px;
+    font-size: 1.1rem;
   }
 
   .stats-grid {

@@ -1,19 +1,20 @@
 <template>
-  <div class="score-display">
-    <div class="score-box home-score">
-      <div class="team-label">Home Team</div>
-      <div class="score">{{ homeScore }}</div>
+  <div class="score-display-compact">
+    <div class="score-item-compact">
+      <span class="team-label-compact">Home Team</span>
+      <span class="score-value-compact">{{ homeScore }}</span>
     </div>
 
-    <div class="score-separator">-</div>
+    <span class="score-separator-compact">-</span>
 
-    <div class="score-box opposition-score">
-      <div class="team-label">Opposition</div>
-      <div class="score">{{ oppositionScoreLocal }}</div>
-      <div class="score-controls">
-        <button class="score-btn" @click="decrementOpposition">-</button>
-        <button class="score-btn" @click="incrementOpposition">+</button>
-      </div>
+    <div class="score-item-compact">
+      <span class="score-value-compact">{{ oppositionScoreLocal }}</span>
+      <span class="team-label-compact">Opposition</span>
+    </div>
+
+    <div class="score-controls-compact">
+      <button class="score-btn-compact" @click="decrementOpposition" title="Decrease opposition score">-</button>
+      <button class="score-btn-compact" @click="incrementOpposition" title="Increase opposition score">+</button>
     </div>
   </div>
 </template>
