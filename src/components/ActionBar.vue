@@ -61,8 +61,10 @@ export default {
     }
 
     function confirmReset() {
-      if (confirm('Are you sure you want to start a new game? All current data will be lost.')) {
-        resetGame()
+      if (confirm('Are you sure you want to start a new game? All statistics will be reset.')) {
+        // Ask if they want to keep the current players
+        const keepPlayers = confirm('Do you want to keep the current player names and numbers?\n\nClick OK to keep players, or Cancel to reset to default players.')
+        resetGame(keepPlayers)
         alert('New game started!')
       }
     }

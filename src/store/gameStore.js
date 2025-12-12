@@ -436,7 +436,23 @@ export function exportCSV() {
 }
 
 // Reset game
-export function resetGame() {
+export function resetGame(keepPlayers = false) {
+  let players
+
+  if (keepPlayers) {
+    // Keep player names and numbers but reset their stats
+    players = gameState.players.map(player => ({
+      playerId: player.playerId,
+      jerseyNumber: player.jerseyNumber,
+      name: player.name,
+      totalPoints: 0,
+      totalFouls: 0,
+      statistics: []
+    }))
+  } else {
+    players = createDefaultPlayers()
+  }
+
   const newGame = {
     gameId: generateUUID(),
     homeTeam: 'Home Team',
@@ -444,7 +460,7 @@ export function resetGame() {
     date: new Date().toISOString(),
     oppositionScore: 0,
     quarters: createDefaultQuarters(),
-    players: createDefaultPlayers(),
+    players: players,
     currentQuarter: 'Q1',
     overtimeCount: 0,
     history: []

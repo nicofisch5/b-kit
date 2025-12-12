@@ -883,6 +883,14 @@ body {
   color: white;
 }
 
+.player-select-btn:hover:not(:disabled) .player-number-large {
+  color: white;
+}
+
+.player-select-btn:hover:not(:disabled) .player-name-small {
+  color: white;
+}
+
 .player-select-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
@@ -891,6 +899,14 @@ body {
 .player-select-btn.assist-btn:hover {
   background-color: var(--success-color);
   border-color: var(--success-color);
+  color: white;
+}
+
+.player-select-btn.assist-btn:hover .player-number-large {
+  color: white;
+}
+
+.player-select-btn.assist-btn:hover .player-name-small {
   color: white;
 }
 
