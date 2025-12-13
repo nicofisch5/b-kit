@@ -14,7 +14,7 @@
       <QuarterLogs @action-reverted="handleActionReverted" @undo="handleUndo" />
     </div>
 
-    <ActionBar @box-score="handleBoxScore" @save="handleSave" @export="handleExport" @import="handleImport" />
+    <ActionBar @box-score="handleBoxScore" @export="handleExport" @import="handleImport" />
 
     <BoxScore :show="showBoxScore" @close="handleBoxScoreClose" />
 
@@ -46,7 +46,7 @@ import PlayerSelectionModal from './components/PlayerSelectionModal.vue'
 import ActionBar from './components/ActionBar.vue'
 import QuarterLogs from './components/QuarterLogs.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
-import { undoLastAction, saveGame, exportJSON, exportCSV, importGame } from './store/gameStore'
+import { undoLastAction, exportJSON, exportCSV, importGame, gameState, StatType } from './store/gameStore'
 
 export default {
   name: 'App',
@@ -73,7 +73,7 @@ export default {
       notification.value = { message, type }
       setTimeout(() => {
         notification.value = null
-      }, 2000)
+      }, 4000)
     }
 
     function handlePlayerSelected(playerId) {
@@ -88,10 +88,62 @@ export default {
 
     function handlePlayerSelectedFromModal({ playerId, assistPlayerId }) {
       // This is handled in the modal component which calls recordStat
+      const player = gameState.players.find(p => p.playerId === playerId)
+      const assistPlayer = assistPlayerId ? gameState.players.find(p => p.playerId === assistPlayerId) : null
+
+      let message = ''
+      const playerInfo = `#${player.jerseyNumber} ${player.name}`
+
+      switch (pendingStatType.value) {
+        case StatType.TWO_PT_MADE:
+          message = `2pts from ${playerInfo}`
+          break
+        case StatType.THREE_PT_MADE:
+          message = `3pts from ${playerInfo}`
+          break
+        case StatType.FT_MADE:
+          message = `1pt from ${playerInfo}`
+          break
+        case StatType.TWO_PT_MISS:
+          message = `2pts miss from ${playerInfo}`
+          break
+        case StatType.THREE_PT_MISS:
+          message = `3pts miss from ${playerInfo}`
+          break
+        case StatType.FT_MISS:
+          message = `Free throw miss from ${playerInfo}`
+          break
+        case StatType.OFF_REB:
+          message = `Offensive rebound from ${playerInfo}`
+          break
+        case StatType.DEF_REB:
+          message = `Defensive rebound from ${playerInfo}`
+          break
+        case StatType.STEAL:
+          message = `Steal from ${playerInfo}`
+          break
+        case StatType.BLOCK:
+          message = `Block from ${playerInfo}`
+          break
+        case StatType.FOUL:
+          message = `Foul from ${playerInfo}`
+          break
+        case StatType.TURNOVER:
+          message = `Turnover from ${playerInfo}`
+          break
+        default:
+          message = `Stat from ${playerInfo}`
+      }
+
+      if (assistPlayer) {
+        message += `, assist from #${assistPlayer.jerseyNumber} ${assistPlayer.name}`
+      }
+
       showPlayerModal.value = false
       pendingStatType.value = null
       pendingStatLabel.value = ''
-      showNotification('Stat recorded successfully')
+      selectedPlayerId.value = null
+      showNotification(message)
     }
 
     function handleModalCancel() {
@@ -106,15 +158,6 @@ export default {
         showNotification('Last action undone')
       } else {
         showNotification('Nothing to undo', 'error')
-      }
-    }
-
-    function handleSave() {
-      const success = saveGame()
-      if (success) {
-        showNotification('Game saved successfully')
-      } else {
-        showNotification('Error saving game', 'error')
       }
     }
 
@@ -163,7 +206,6 @@ export default {
       handlePlayerSelectedFromModal,
       handleModalCancel,
       handleUndo,
-      handleSave,
       handleExport,
       handleImport,
       handleActionReverted,

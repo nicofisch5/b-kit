@@ -5,11 +5,6 @@
       Box Score
     </button>
 
-    <button class="action-btn save-btn" @click="handleSave">
-      <span class="btn-icon">💾</span>
-      Save Game
-    </button>
-
     <div class="export-dropdown">
       <button class="action-btn export-btn" @click="toggleExportMenu">
         <span class="btn-icon">📊</span>
@@ -51,17 +46,13 @@ import { resetGame } from '../store/gameStore'
 
 export default {
   name: 'ActionBar',
-  emits: ['box-score', 'save', 'export', 'import'],
+  emits: ['box-score', 'export', 'import'],
   setup(props, { emit }) {
     const showExportMenu = ref(false)
     const fileInput = ref(null)
 
     function handleBoxScore() {
       emit('box-score')
-    }
-
-    function handleSave() {
-      emit('save')
     }
 
     function toggleExportMenu() {
@@ -108,7 +99,6 @@ export default {
       showExportMenu,
       fileInput,
       handleBoxScore,
-      handleSave,
       toggleExportMenu,
       handleExport,
       triggerFileInput,

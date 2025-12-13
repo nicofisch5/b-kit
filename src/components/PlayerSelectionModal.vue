@@ -2,7 +2,7 @@
   <div class="modal-overlay" @click.self="cancel">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>{{ statLabel }}</h2>
+        <h2>{{ modalTitle }}</h2>
         <button class="close-btn" @click="cancel">&times;</button>
       </div>
 
@@ -107,6 +107,10 @@ export default {
       return gameState.players.filter(p => p.playerId !== selectedScoringPlayerId.value)
     })
 
+    const modalTitle = computed(() => {
+      return showAssistSelection.value ? 'Assist?' : props.statLabel
+    })
+
     function selectPlayer(playerId) {
       if (isFieldGoalMade.value) {
         selectedScoringPlayerId.value = playerId
@@ -140,6 +144,7 @@ export default {
       showAssistSelection,
       selectedScoringPlayerId,
       assistPlayers,
+      modalTitle,
       selectPlayer,
       selectAssistPlayer,
       recordWithoutAssist,
