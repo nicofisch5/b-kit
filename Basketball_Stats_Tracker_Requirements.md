@@ -1,5 +1,7 @@
 # Basketball Stats Tracker - Technical and Functional Document
 
+> **IMPORTANT - DOCUMENTATION MAINTENANCE:** When making changes to requirements or implementation, always update this file, SETUP_GUIDE.md, and ONBOARDING.html to reflect the changes. Documentation should always match the current implementation.
+
 ## 1. Executive Summary
 
 This document defines the technical and functional requirements for a Basketball Stats Tracker application designed to record and manage real-time statistics for a home team during basketball games. The application provides an intuitive interface for tracking player performance metrics across quarters and overtime periods.
@@ -354,13 +356,34 @@ PLAYMAKING:
 
 ---
 
+## 11. User Documentation
+
+### 11.1 Onboarding Materials
+The project includes comprehensive onboarding materials in `ONBOARDING.html`:
+- Quick start guide for coaches and team staff
+- QR code generator for easy app access
+- Printable PDF format
+- Step-by-step usage instructions
+- Troubleshooting guide
+
+### 11.2 Setup Guide
+See `SETUP_GUIDE.md` for:
+- Developer setup instructions
+- Deployment guidelines
+- Customization tips
+- Technical configuration
+
+---
+
 ## 12. Document Control
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | 2025-12-12 | System | Initial document creation |
+| 1.1 | 2025-12-13 | System | Added onboarding materials, documentation maintenance reminder |
 
 ---
 
-**Document Status**: Draft for Review
-**Last Updated**: 2025-12-12
+**Document Status**: Active - Keep Updated
+**Last Updated**: 2025-12-13
+**Reminder**: Always update SETUP_GUIDE.md and ONBOARDING.html when changing requirements or implementation

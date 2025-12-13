@@ -1,3 +1,15 @@
+/**
+ * B-Strack Game Store - Central state management for basketball statistics
+ *
+ * IMPORTANT - DOCUMENTATION MAINTENANCE:
+ * When making changes to game logic, data structures, or features, always update:
+ * - SETUP_GUIDE.md (developer documentation)
+ * - Basketball_Stats_Tracker_Requirements.md (technical specs and data models)
+ * - ONBOARDING.html (user guide)
+ *
+ * These files should always reflect the current implementation.
+ */
+
 import { reactive, watch } from 'vue'
 import { calculatePlayerStats } from '../utils/statsCalculator'
 

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-Strack Onboarding Guide</title>
+  <style>
+    @media print {
+      body {
+        margin: 0;
+        padding: 20mm;
+      }
+      .no-print {
+        display: none;
+      }
+      .page-break {
+        page-break-after: always;
+      }
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 210mm;
+      margin: 0 auto;
+      padding: 20px;
+      background: #fff;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      border-bottom: 3px solid #ff6b35;
+      padding-bottom: 20px;
+    }
+
+    .logo {
+      font-size: 48px;
+      color: #ff6b35;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #666;
+      margin: 10px 0;
+    }
+
+    .qr-section {
+      text-align: center;
+      margin: 30px 0;
+      padding: 20px;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .qr-code-image {
+      max-width: 256px;
+      height: auto;
+      margin: 20px auto;
+      display: block;
+      border: 4px solid #ff6b35;
+      border-radius: 8px;
+    }
+
+    .qr-instruction {
+      font-size: 14px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    .section {
+      margin: 25px 0;
+    }
+
+    h2 {
+      color: #ff6b35;
+      border-left: 4px solid #ff6b35;
+      padding-left: 15px;
+      margin-top: 30px;
+    }
+
+    h3 {
+      color: #333;
+      margin-top: 20px;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 10px;
+      margin: 8px 0;
+      background: #f9f9f9;
+      border-left: 3px solid #ff6b35;
+      padding-left: 15px;
+    }
+
+    .step {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 15px;
+      margin: 10px 0;
+    }
+
+    .step-number {
+      background: #ff6b35;
+      color: white;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      margin-right: 10px;
+    }
+
+    .tip {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 12px;
+      margin: 15px 0;
+    }
+
+    .button-demo {
+      display: inline-block;
+      padding: 8px 16px;
+      background: #ff6b35;
+      color: white;
+      border-radius: 4px;
+      margin: 5px;
+      font-weight: bold;
+    }
+
+    .print-btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+
+    .print-btn:hover {
+      background: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1 class="logo">B-Strack</h1>
+    <p class="subtitle">Basketball Statistics Tracker - Quick Start Guide</p>
+  </div>
+
+  <div class="qr-section">
+    <h3>Scan to Access B-Strack</h3>
+    <img src="/qr-code.png" alt="B-Strack QR Code" class="qr-code-image">
+    <div class="no-print" style="margin-top: 15px;">
+      <button onclick="window.print()" class="print-btn">Print to PDF</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>What is B-Strack?</h2>
+    <p>B-Strack is a Progressive Web App (PWA) designed to help coaches, statisticians, and team staff track basketball game statistics in real-time. Built with modern web technologies, it works seamlessly on mobile devices, tablets, and desktops.</p>
+  </div>
+
+  <div class="section">
+    <h2>Key Features</h2>
+    <ul class="feature-list">
+      <li><strong>Real-time Statistics Tracking:</strong> Record all basketball stats including points, rebounds, assists, steals, blocks, fouls, and turnovers</li>
+      <li><strong>Quarter Management:</strong> Track statistics by quarter (Q1, Q2, Q3, Q4) and overtime periods</li>
+      <li><strong>Player Management:</strong> Manage up to 12 players with customizable names and jersey numbers</li>
+      <li><strong>Automatic Score Calculation:</strong> Home team score updates automatically based on recorded field goals and free throws</li>
+      <li><strong>Offline Capability:</strong> Works without internet connection once installed</li>
+      <li><strong>Auto-Save:</strong> Data saved automatically every 30 seconds to prevent loss</li>
+      <li><strong>Export Options:</strong> Export game data as JSON for backup or analysis</li>
+    </ul>
+  </div>
+
+  <div class="section page-break">
+    <h2>Getting Started</h2>
+
+    <div class="step">
+      <span class="step-number">1</span>
+      <strong>Access the App</strong>
+      <p>Scan the QR code above or visit the app URL in your mobile browser. For best experience, use Chrome, Safari, or Edge.</p>
+    </div>
+
+    <div class="step">
+      <span class="step-number">2</span>
+      <strong>Install as PWA (Recommended)</strong>
+      <p>When prompted, tap "Add to Home Screen" or "Install". This allows the app to work offline and load faster.</p>
+      <ul>
+        <li><strong>iOS Safari:</strong> Tap the share icon → "Add to Home Screen"</li>
+        <li><strong>Android Chrome:</strong> Tap the menu (⋮) → "Install app" or "Add to Home Screen"</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <span class="step-number">3</span>
+      <strong>Customize Your Team</strong>
+      <p>Before the game starts, tap "Edit Players" to customize player names and jersey numbers for your team.</p>
+    </div>
+
+    <div class="step">
+      <span class="step-number">4</span>
+      <strong>Start Tracking</strong>
+      <p>You're ready to go! Click any stat button, select the player, and watch the stats update in real-time.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>How to Record Statistics</h2>
+
+    <h3>Basic Workflow</h3>
+    <ol>
+      <li><strong>Select the Quarter:</strong> Choose Q1, Q2, Q3, Q4, or + OT</li>
+      <li><strong>Click a Stat Button:</strong> Examples: <span class="button-demo">2PT Made</span> <span class="button-demo">Assist</span> <span class="button-demo">Def Reb</span></li>
+      <li><strong>Choose the Player:</strong> A modal will appear - tap the player who performed the action</li>
+      <li><strong>Confirm:</strong> The stat is recorded and displays update automatically</li>
+    </ol>
+
+    <div class="tip">
+      <strong>Tip:</strong> For field goals (2PT/3PT) and free throws, you can also select an assist after choosing the scorer!
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Understanding the Interface</h2>
+
+    <h3>Score Display (Top)</h3>
+    <p>Shows the current home team score (auto-calculated) and opposition score (manually entered)</p>
+
+    <h3>Quarter Selector</h3>
+    <p>Switch between quarters to view or record stats for different periods. The active quarter is highlighted.</p>
+
+    <h3>Player Roster (Left/Top)</h3>
+    <p>Displays all players with their current fouls and points. Players with 5 fouls are highlighted in red.</p>
+
+    <h3>Stats Control Panel (Center/Bottom)</h3>
+    <p>Grid of buttons for recording different basketball statistics:</p>
+    <ul>
+      <li><strong>Green buttons:</strong> Made shots (2PT Made, 3PT Made, FT Made)</li>
+      <li><strong>Red buttons:</strong> Missed shots (2PT Miss, 3PT Miss, FT Miss)</li>
+      <li><strong>Blue buttons:</strong> Other actions (Rebounds, Assists, Steals, Blocks, Fouls, Turnovers)</li>
+    </ul>
+
+    <h3>Action Bar (Bottom)</h3>
+    <p>Contains important game management functions:</p>
+    <ul>
+      <li><strong>Undo:</strong> Reverse the last recorded action</li>
+      <li><strong>Box Score:</strong> View comprehensive game statistics</li>
+      <li><strong>Quarter Logs:</strong> See all events recorded in the current quarter</li>
+      <li><strong>Edit Players:</strong> Modify player information</li>
+      <li><strong>Export:</strong> Download game data as JSON</li>
+      <li><strong>New Game:</strong> Start fresh (with confirmation)</li>
+    </ul>
+  </div>
+
+  <div class="section page-break">
+    <h2>Best Practices</h2>
+
+    <div class="tip">
+      <strong>Before the Game:</strong>
+      <ul>
+        <li>Edit player names and jersey numbers</li>
+        <li>Enter the opposition team name</li>
+        <li>Ensure your device is charged or connected to power</li>
+        <li>Test the app to familiarize yourself with the interface</li>
+      </ul>
+    </div>
+
+    <div class="tip">
+      <strong>During the Game:</strong>
+      <ul>
+        <li>Record stats as they happen - don't wait</li>
+        <li>Use the Undo button if you make a mistake</li>
+        <li>Update the opposition score periodically</li>
+        <li>Switch quarters at the end of each period</li>
+        <li>Keep your device on and the app in the foreground</li>
+      </ul>
+    </div>
+
+    <div class="tip">
+      <strong>After the Game:</strong>
+      <ul>
+        <li>Review the Box Score for complete statistics</li>
+        <li>Export the game data for your records</li>
+        <li>Share screenshots or export files with your team</li>
+        <li>Start a new game when ready for the next match</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>Troubleshooting</h2>
+
+    <h3>App not loading?</h3>
+    <p>Check your internet connection. After the first load, the app works offline.</p>
+
+    <h3>Data disappeared?</h3>
+    <p>Data is stored locally. If you cleared browser data or switched devices, data may be lost. Export regularly!</p>
+
+    <h3>Can't install as PWA?</h3>
+    <p>Ensure you're using HTTPS (not HTTP) and that your browser supports PWAs. Try Chrome or Safari.</p>
+
+    <h3>Screen too small?</h3>
+    <p>The app is responsive. Try rotating your device to landscape mode or zooming out.</p>
+
+    <h3>Undo not working?</h3>
+    <p>Undo only works for the most recent action. Once you record a new stat, the previous undo is lost.</p>
+  </div>
+
+  <div class="section">
+    <h2>Contact & Support</h2>
+    <p>For technical support, feature requests, or bug reports, please contact your app administrator or visit the project repository.</p>
+    <p style="text-align: center; margin-top: 40px; color: #999;">
+      <strong>B-Strack v1.0.0</strong><br>
+      Built with Vue.js - Progressive Web App
+    </p>
+  </div>
+
+</body>
+</html>

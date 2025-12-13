@@ -1,5 +1,18 @@
+<!--
+  B-Strack - Basketball Statistics Tracker
+
+  IMPORTANT - DOCUMENTATION MAINTENANCE:
+  When making changes to this app, always update:
+  - SETUP_GUIDE.md (developer documentation)
+  - Basketball_Stats_Tracker_Requirements.md (technical specs)
+  - ONBOARDING.html (user guide)
+
+  These files should always reflect the current implementation.
+-->
 <template>
   <div id="app" class="app-container">
+    <UpdateNotification />
+
     <header class="app-header">
       <img src="/b-Strack_logo-t.png" alt="B-Strack Logo" class="app-logo" />
       <h1 class="app-title">B-Strack</h1>
@@ -32,6 +45,14 @@
     </div>
 
     <ThemeToggle />
+
+    <footer class="app-footer">
+      <a href="/ONBOARDING.html" target="_blank" class="footer-link">
+        <span class="footer-icon">📖</span>
+        User Guide & Help
+      </a>
+      <span class="footer-version">v1.1.0</span>
+    </footer>
   </div>
 </template>
 
@@ -46,6 +67,7 @@ import PlayerSelectionModal from './components/PlayerSelectionModal.vue'
 import ActionBar from './components/ActionBar.vue'
 import QuarterLogs from './components/QuarterLogs.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
+import UpdateNotification from './components/UpdateNotification.vue'
 import { undoLastAction, exportJSON, exportCSV, importGame, gameState, StatType } from './store/gameStore'
 
 export default {
@@ -59,7 +81,8 @@ export default {
     PlayerSelectionModal,
     ActionBar,
     QuarterLogs,
-    ThemeToggle
+    ThemeToggle,
+    UpdateNotification
   },
   setup() {
     const selectedPlayerId = ref(null)

@@ -1,3 +1,13 @@
+/**
+ * Vite Configuration for B-Strack PWA
+ *
+ * IMPORTANT - DOCUMENTATION MAINTENANCE:
+ * When making changes to PWA configuration, build settings, or manifest, always update:
+ * - SETUP_GUIDE.md (deployment and configuration instructions)
+ * - Basketball_Stats_Tracker_Requirements.md (technical requirements section)
+ * - ONBOARDING.html (installation instructions)
+ */
+
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
@@ -6,7 +16,7 @@ export default defineConfig({
   plugins: [
     vue(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'prompt',
       includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
       manifest: {
         name: 'B-Strack',

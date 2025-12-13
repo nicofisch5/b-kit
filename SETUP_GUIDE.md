@@ -1,5 +1,12 @@
 # Quick Setup Guide
 
+> **IMPORTANT - DOCUMENTATION MAINTENANCE:** When making changes to the application, always update this file, Basketball_Stats_Tracker_Requirements.md, and ONBOARDING.html to reflect the changes. Documentation should always match the current implementation.
+
+## Quick Links
+
+- **For End Users:** See [ONBOARDING.html](ONBOARDING.html) - Open in browser to generate a printable PDF guide with QR code
+- **For Developers:** Continue reading below
+
 ## Step 1: Install Dependencies
 
 Open a terminal in the project directory and run:
@@ -115,6 +122,24 @@ Copy the `dist/` directory to your web server and configure to serve the files w
 2. **Start recording stats** immediately - the app comes pre-configured with 12 players
 3. **Data is auto-saved** to localStorage every 30 seconds
 4. **Install as PWA** for offline access (look for install prompt in browser)
+
+## Creating Onboarding Materials
+
+The project includes `ONBOARDING.html` - a comprehensive user guide that can be:
+1. Opened in a web browser
+2. Customized with your app's URL to generate a QR code
+3. Printed to PDF for distribution to coaches and staff
+4. Shared electronically with team members
+
+To use:
+```bash
+# Simply open the file in your browser
+open ONBOARDING.html  # macOS
+start ONBOARDING.html # Windows
+xdg-open ONBOARDING.html # Linux
+```
+
+Enter your deployed app URL, click "Generate QR Code", then "Print to PDF" to create professional onboarding materials.
 
 ## Customization Tips
 
