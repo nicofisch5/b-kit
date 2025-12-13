@@ -12,6 +12,7 @@
 <template>
   <div id="app" class="app-container">
     <UpdateNotification />
+    <AutoSaveIndicator />
 
     <header class="app-header">
       <img src="/b-Strack_logo-t.png" alt="B-Strack Logo" class="app-logo" />
@@ -68,6 +69,7 @@ import ActionBar from './components/ActionBar.vue'
 import QuarterLogs from './components/QuarterLogs.vue'
 import ThemeToggle from './components/ThemeToggle.vue'
 import UpdateNotification from './components/UpdateNotification.vue'
+import AutoSaveIndicator from './components/AutoSaveIndicator.vue'
 import { undoLastAction, exportJSON, exportCSV, importGame, gameState, StatType } from './store/gameStore'
 
 export default {
@@ -82,7 +84,8 @@ export default {
     ActionBar,
     QuarterLogs,
     ThemeToggle,
-    UpdateNotification
+    UpdateNotification,
+    AutoSaveIndicator
   },
   setup() {
     const selectedPlayerId = ref(null)

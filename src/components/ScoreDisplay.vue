@@ -7,14 +7,16 @@
 
     <span class="score-separator-compact">-</span>
 
-    <div class="score-item-compact">
+    <div class="score-item-compact score-item-opponent">
       <span class="score-value-compact">{{ oppositionScoreLocal }}</span>
-      <span class="team-label-compact">{{ oppositionTeamName }}</span>
-    </div>
 
-    <div class="score-controls-compact">
-      <button class="score-btn-compact" @click="decrementOpposition" title="Decrease opposition score">-</button>
-      <button class="score-btn-compact" @click="incrementOpposition" title="Increase opposition score">+</button>
+      <!-- Buttons between score and label (stacked vertically) -->
+      <div class="score-controls-compact score-controls-stacked">
+        <button class="score-btn-compact score-btn-stacked" @click="incrementOpposition" title="Increase opposition score">+</button>
+        <button class="score-btn-compact score-btn-stacked" @click="decrementOpposition" title="Decrease opposition score">-</button>
+      </div>
+
+      <span class="team-label-compact">{{ oppositionTeamName }}</span>
     </div>
   </div>
 </template>

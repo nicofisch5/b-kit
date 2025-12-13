@@ -115,11 +115,12 @@ body {
 }
 
 .score-value-compact {
-  font-size: 2rem;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--primary-color);
-  min-width: 40px;
+  min-width: 60px;
   text-align: center;
+  line-height: 1;
 }
 
 .score-separator-compact {
@@ -134,13 +135,32 @@ body {
   gap: var(--spacing-xs);
 }
 
+/* Stacked controls for all screen sizes */
+.score-controls-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* Stacked buttons styling */
+.score-btn-stacked {
+  width: 20px;
+  height: 20px;
+  font-size: 0.75rem;
+  line-height: 1;
+  padding: 0;
+}
+
+/* Adjust opponent score item layout */
+.score-item-opponent {
+  gap: var(--spacing-sm);
+}
+
 .score-btn-compact {
   background-color: var(--secondary-color);
   border: none;
   color: white;
   font-size: 1.3rem;
-  width: 36px;
-  height: 36px;
   border-radius: 50%;
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -825,6 +845,60 @@ body {
   }
 }
 
+/* Mobile bottom sheet modal */
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modal-content {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin: 0;
+    animation: slideUpFromBottom 0.3s ease;
+  }
+
+  @keyframes slideUpFromBottom {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  /* Add a handle indicator at the top */
+  .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background-color: var(--border-color);
+    border-radius: 2px;
+  }
+
+  .modal-header {
+    position: relative;
+    padding-top: calc(var(--spacing-lg) + 8px);
+  }
+}
+
+/* Terminal theme - no bottom sheet on mobile, but keep border style */
+@media (max-width: 768px) {
+  [data-theme="terminal"] .modal-content {
+    border-radius: 0;
+  }
+
+  [data-theme="terminal"] .modal-header::before {
+    background-color: var(--border-color);
+  }
+}
+
 .modal-header {
   display: flex;
   justify-content: space-between;
@@ -1064,11 +1138,22 @@ body {
   }
 
   .score-value-compact {
-    font-size: 1.5rem;
+    font-size: 2.5rem;
   }
 
   .team-label-compact {
     font-size: 0.85rem;
+  }
+
+  /* Adjust stacked buttons for tablet */
+  .score-btn-stacked {
+    width: 18px;
+    height: 18px;
+    font-size: 0.7rem;
+  }
+
+  .score-controls-stacked {
+    gap: 2px;
   }
 
   .quarter-selector {
@@ -1083,6 +1168,12 @@ body {
 
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .stat-btn {
+    min-height: 65px;
+    font-size: 1rem;
+    padding: var(--spacing-md) var(--spacing-sm);
   }
 
   .player-grid {
@@ -1104,10 +1195,7 @@ body {
     font-size: 1rem;
   }
 
-  .modal-content {
-    max-width: 100%;
-    margin: var(--spacing-md);
-  }
+  /* Removed duplicate - handled by bottom sheet styles above */
 
   .notification {
     bottom: var(--spacing-md);
@@ -1128,21 +1216,27 @@ body {
   }
 
   .score-value-compact {
-    font-size: 1.3rem;
+    font-size: 2rem;
   }
 
   .team-label-compact {
     font-size: 0.75rem;
   }
 
-  .score-btn-compact {
-    width: 32px;
-    height: 32px;
-    font-size: 1.1rem;
+  /* Adjust stacked buttons for small mobile */
+  .score-btn-stacked {
+    width: 16px;
+    height: 16px;
+    font-size: 0.65rem;
   }
 
   .stats-grid {
     grid-template-columns: 1fr;
+  }
+
+  .stat-btn {
+    min-height: 70px;
+    font-size: 1.05rem;
   }
 
   .player-grid {
@@ -1227,6 +1321,23 @@ input:focus-visible {
   animation: slideUp 0.3s ease;
   display: flex;
   flex-direction: column;
+}
+
+/* Mobile bottom sheet for box score */
+@media (max-width: 768px) {
+  .box-score-modal {
+    max-width: 100%;
+    max-height: 85vh;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    animation: slideUpFromBottom 0.3s ease;
+  }
+}
+
+/* Terminal theme box score on mobile */
+@media (max-width: 768px) {
+  [data-theme="terminal"] .box-score-modal {
+    border-radius: 0;
+  }
 }
 
 .table-container {
