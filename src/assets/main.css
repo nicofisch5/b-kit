@@ -1,4 +1,7 @@
 /* ===== Reset & Base Styles ===== */
+/* Import IBM Plex Mono for Terminal theme */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&display=swap');
+
 * {
   margin: 0;
   padding: 0;
@@ -430,6 +433,7 @@ body {
   color: white;
   min-height: 50px;
   box-shadow: var(--shadow-sm);
+  white-space: normal;
 }
 
 .stat-btn:hover {
@@ -1419,7 +1423,7 @@ input:focus-visible {
 }
 
 [data-theme="terminal"] body {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.4;
@@ -1462,7 +1466,7 @@ input:focus-visible {
   border: 2px solid var(--border-color);
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
   font-weight: bold;
 }
 
@@ -1526,6 +1530,7 @@ input:focus-visible {
   text-shadow: none;
   font-weight: bold;
   letter-spacing: 2px;
+  font-family: 'IBM Plex Mono', monospace;
 }
 
 [data-theme="terminal"] .team-label-compact,
@@ -1566,7 +1571,7 @@ input:focus-visible {
   border: 2px solid var(--border-color);
   background-color: var(--bg-color);
   color: var(--text-color);
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'IBM Plex Mono', 'Courier New', Courier, monospace;
 }
 
 [data-theme="terminal"] .logs-count {
@@ -1586,14 +1591,59 @@ input:focus-visible {
   max-width: 1200px;
 }
 
-/* Terminal theme - remove all color-coded elements */
-[data-theme="terminal"] .stat-btn.made,
-[data-theme="terminal"] .stat-btn.miss,
-[data-theme="terminal"] .stat-btn.neutral,
-[data-theme="terminal"] .stat-btn.positive,
+/* Terminal theme - ASCII patterns for different button types */
+[data-theme="terminal"] .stat-btn.made {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 3px double var(--border-color);
+  position: relative;
+}
+
+[data-theme="terminal"] .stat-btn.made::before {
+  content: '[✓] ';
+  font-weight: bold;
+}
+
+[data-theme="terminal"] .stat-btn.miss {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 2px dashed var(--border-color);
+}
+
+[data-theme="terminal"] .stat-btn.miss::before {
+  content: '[✗] ';
+  font-weight: bold;
+}
+
+[data-theme="terminal"] .stat-btn.neutral {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+}
+
+[data-theme="terminal"] .stat-btn.neutral::before {
+  content: '[•] ';
+}
+
+[data-theme="terminal"] .stat-btn.positive {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+  border-style: solid solid double solid;
+}
+
+[data-theme="terminal"] .stat-btn.positive::before {
+  content: '[+] ';
+}
+
 [data-theme="terminal"] .stat-btn.negative {
   background-color: var(--bg-color);
   color: var(--text-color);
+  border: 2px dotted var(--border-color);
+}
+
+[data-theme="terminal"] .stat-btn.negative::before {
+  content: '[!] ';
 }
 
 [data-theme="terminal"] .stat-btn.made:hover,
@@ -1603,6 +1653,22 @@ input:focus-visible {
 [data-theme="terminal"] .stat-btn.negative:hover {
   background-color: var(--highlight-bg);
   color: var(--highlight-text);
+}
+
+/* Keep text on one line in Terminal mode on desktop */
+[data-theme="terminal"] .stat-btn {
+  white-space: nowrap;
+  font-size: 0.85rem;
+  padding: var(--spacing-sm) var(--spacing-xs);
+}
+
+/* Mobile/Tablet - allow wrapping */
+@media (max-width: 1024px) {
+  [data-theme="terminal"] .stat-btn {
+    white-space: normal;
+    font-size: 0.95rem;
+    padding: var(--spacing-md);
+  }
 }
 
 /* ===== App Footer ===== */
