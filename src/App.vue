@@ -52,7 +52,7 @@
         <span class="footer-icon">📖</span>
         User Guide & Help
       </a>
-      <span class="footer-version">v1.1.0</span>
+      <span class="footer-version">v{{ appVersion }}</span>
     </footer>
   </div>
 </template>
@@ -71,6 +71,7 @@ import ThemeToggle from './components/ThemeToggle.vue'
 import UpdateNotification from './components/UpdateNotification.vue'
 import AutoSaveIndicator from './components/AutoSaveIndicator.vue'
 import { undoLastAction, exportJSON, exportCSV, importGame, gameState, StatType } from './store/gameStore'
+import { version } from '../package.json'
 
 export default {
   name: 'App',
@@ -88,6 +89,7 @@ export default {
     AutoSaveIndicator
   },
   setup() {
+    const appVersion = version
     const selectedPlayerId = ref(null)
     const showPlayerModal = ref(false)
     const showBoxScore = ref(false)
@@ -238,6 +240,7 @@ export default {
     }
 
     return {
+      appVersion,
       selectedPlayerId,
       showPlayerModal,
       showBoxScore,
