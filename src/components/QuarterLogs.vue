@@ -54,22 +54,41 @@ export default {
     const currentQuarterName = computed(() => gameState.currentQuarter)
     const isExpanded = ref(true)
 
+    // Create player map for O(1) lookup instead of O(n) find
+    const playerMap = computed(() => {
+      const map = new Map()
+      for (const player of gameState.players) {
+        map.set(player.playerId, player)
+      }
+      return map
+    })
+
     const logs = computed(() => {
+      // Performance: only compute when expanded
+      if (!isExpanded.value) return []
+
       const quarter = getCurrentQuarter()
       if (!quarter) return []
 
-      // Get all events from current quarter
-      return quarter.statistics.map(stat => {
-        const player = gameState.players.find(p => p.playerId === stat.playerId)
-        return {
+      // Get all events from current quarter with optimized player lookup
+      const events = []
+      const pMap = playerMap.value
+
+      // Reverse iteration to avoid creating temporary array
+      for (let i = quarter.statistics.length - 1; i >= 0; i--) {
+        const stat = quarter.statistics[i]
+        const player = pMap.get(stat.playerId)
+        events.push({
           eventId: stat.eventId,
           playerId: stat.playerId,
           playerName: player ? player.name : 'Unknown',
           jerseyNumber: player ? player.jerseyNumber : '?',
           statType: stat.statType,
           timestamp: stat.timestamp
-        }
-      }).reverse() // Most recent first
+        })
+      }
+
+      return events
     })
 
     function formatStatType(statType) {

@@ -89,7 +89,24 @@ export default {
     function handlePlayerSelectedFromModal({ playerId, assistPlayerId }) {
       // This is handled in the modal component which calls recordStat
       const player = gameState.players.find(p => p.playerId === playerId)
+
+      // Security: Validate player exists
+      if (!player) {
+        console.error('Player not found:', playerId)
+        showNotification('Error: Player not found', 'error')
+        showPlayerModal.value = false
+        return
+      }
+
       const assistPlayer = assistPlayerId ? gameState.players.find(p => p.playerId === assistPlayerId) : null
+
+      // Security: Validate assist player exists if assistPlayerId provided
+      if (assistPlayerId && !assistPlayer) {
+        console.error('Assist player not found:', assistPlayerId)
+        showNotification('Error: Assist player not found', 'error')
+        showPlayerModal.value = false
+        return
+      }
 
       let message = ''
       const playerInfo = `#${player.jerseyNumber} ${player.name}`

@@ -1,4 +1,5 @@
 import { reactive, watch } from 'vue'
+import { calculatePlayerStats } from '../utils/statsCalculator'
 
 // Utility function to generate UUID
 function generateUUID() {
@@ -77,32 +78,38 @@ function loadGame() {
 // Create reactive game state
 export const gameState = reactive(loadGame())
 
-// Auto-save to localStorage
+// Auto-save to localStorage (increased interval for better performance)
 let autoSaveTimer = null
 function scheduleAutoSave() {
   if (autoSaveTimer) clearTimeout(autoSaveTimer)
   autoSaveTimer = setTimeout(() => {
     saveGame()
-  }, 30000) // 30 seconds
+  }, 60000) // 60 seconds (increased from 30s for performance)
 }
 
-// Watch for changes and schedule auto-save
+// Watch for changes and schedule auto-save (optimized - removed spread operator and deep watch)
 watch(
-  () => ({ ...gameState }),
+  () => gameState.history.length, // Watch history length as proxy for changes
   () => {
     scheduleAutoSave()
-  },
-  { deep: true }
+  }
 )
 
-// Save game to localStorage
+// Save game to localStorage (async to avoid blocking UI)
 export function saveGame() {
   try {
-    localStorage.setItem('basketballGame', JSON.stringify(gameState))
-    console.log('Game saved successfully')
+    // Defer to next event loop to avoid blocking UI thread
+    setTimeout(() => {
+      try {
+        localStorage.setItem('basketballGame', JSON.stringify(gameState))
+        console.log('Game saved successfully')
+      } catch (e) {
+        console.error('Error saving game:', e)
+      }
+    }, 0)
     return true
   } catch (e) {
-    console.error('Error saving game:', e)
+    console.error('Error preparing game save:', e)
     return false
   }
 }
@@ -258,7 +265,7 @@ export function undoLastAction() {
   return true
 }
 
-// Revert a specific stat event by eventId
+// Revert a specific stat event by eventId (optimized with filter instead of splice)
 export function revertStatEvent(eventId) {
   // Find the event in any quarter
   let foundEvent = null
@@ -273,49 +280,50 @@ export function revertStatEvent(eventId) {
     }
   }
 
-  if (!foundEvent || !foundQuarter) return false
+  if (!foundEvent || !foundQuarter) {
+    console.warn('Event not found:', eventId)
+    return false
+  }
 
   // Find the player
   const player = gameState.players.find(p => p.playerId === foundEvent.playerId)
-  if (!player) return false
+  if (!player) {
+    console.warn('Player not found for event:', foundEvent.playerId)
+    return false
+  }
+
+  // Check for associated assist event before removing
+  const historyEntry = gameState.history.find(h => h.event.eventId === eventId)
+  const assistEventId = historyEntry?.assistEvent?.eventId
 
   // Revert player statistics
   switch (foundEvent.statType) {
     case StatType.TWO_PT_MADE:
-      player.totalPoints -= 2
+      player.totalPoints = Math.max(0, player.totalPoints - 2)
       break
     case StatType.THREE_PT_MADE:
-      player.totalPoints -= 3
+      player.totalPoints = Math.max(0, player.totalPoints - 3)
       break
     case StatType.FT_MADE:
-      player.totalPoints -= 1
+      player.totalPoints = Math.max(0, player.totalPoints - 1)
       break
     case StatType.FOUL:
-      player.totalFouls -= 1
+      player.totalFouls = Math.max(0, player.totalFouls - 1)
       break
   }
 
-  // Remove from player statistics
-  const playerStatIndex = player.statistics.findIndex(s => s.eventId === eventId)
-  if (playerStatIndex !== -1) {
-    player.statistics.splice(playerStatIndex, 1)
-  }
+  // Remove from player statistics (using filter for better performance than splice)
+  player.statistics = player.statistics.filter(s => s.eventId !== eventId)
 
-  // Remove from quarter statistics
-  const quarterStatIndex = foundQuarter.statistics.findIndex(s => s.eventId === eventId)
-  if (quarterStatIndex !== -1) {
-    foundQuarter.statistics.splice(quarterStatIndex, 1)
-  }
+  // Remove from quarter statistics (using filter for better performance than splice)
+  foundQuarter.statistics = foundQuarter.statistics.filter(s => s.eventId !== eventId)
 
-  // Remove from history if present
-  const historyIndex = gameState.history.findIndex(h => h.event.eventId === eventId)
-  if (historyIndex !== -1) {
-    // Check if there's an associated assist to also remove
-    const historyEntry = gameState.history[historyIndex]
-    if (historyEntry.assistEvent) {
-      revertStatEvent(historyEntry.assistEvent.eventId)
-    }
-    gameState.history.splice(historyIndex, 1)
+  // Remove from history
+  gameState.history = gameState.history.filter(h => h.event.eventId !== eventId)
+
+  // Recursively remove assist event if it exists
+  if (assistEventId) {
+    revertStatEvent(assistEventId)
   }
 
   saveGame()
@@ -393,38 +401,10 @@ export function exportCSV() {
   // Box score format header
   let csv = '#,Name,PTS,FGM,FGA,FG%,3PM,3PA,3P%,FTM,FTA,FT%,OREB,DREB,REB,AST,STL,BLK,TO,PF\n'
 
-  // Add player data
+  // Add player data using shared stats calculator
   gameState.players.forEach(player => {
-    const stats = player.statistics
-
-    // Count each stat type
-    const twoMade = stats.filter(s => s.statType === StatType.TWO_PT_MADE).length
-    const twoMiss = stats.filter(s => s.statType === StatType.TWO_PT_MISS).length
-    const threeMade = stats.filter(s => s.statType === StatType.THREE_PT_MADE).length
-    const threeMiss = stats.filter(s => s.statType === StatType.THREE_PT_MISS).length
-    const ftMade = stats.filter(s => s.statType === StatType.FT_MADE).length
-    const ftMiss = stats.filter(s => s.statType === StatType.FT_MISS).length
-    const offReb = stats.filter(s => s.statType === StatType.OFF_REB).length
-    const defReb = stats.filter(s => s.statType === StatType.DEF_REB).length
-    const assists = stats.filter(s => s.statType === StatType.ASSIST).length
-    const steals = stats.filter(s => s.statType === StatType.STEAL).length
-    const blocks = stats.filter(s => s.statType === StatType.BLOCK).length
-    const turnovers = stats.filter(s => s.statType === StatType.TURNOVER).length
-
-    // Calculate derived stats
-    const FGM = twoMade + threeMade
-    const FGA = twoMade + twoMiss + threeMade + threeMiss
-    const FGP = FGA > 0 ? ((FGM / FGA) * 100).toFixed(1) + '%' : '0.0%'
-
-    const TPA = threeMade + threeMiss
-    const TPP = TPA > 0 ? ((threeMade / TPA) * 100).toFixed(1) + '%' : '0.0%'
-
-    const FTA = ftMade + ftMiss
-    const FTP = FTA > 0 ? ((ftMade / FTA) * 100).toFixed(1) + '%' : '0.0%'
-
-    const REB = offReb + defReb
-
-    csv += `${player.jerseyNumber},${player.name},${player.totalPoints},${FGM},${FGA},${FGP},${threeMade},${TPA},${TPP},${ftMade},${FTA},${FTP},${offReb},${defReb},${REB},${assists},${steals},${blocks},${turnovers},${player.totalFouls}\n`
+    const playerStats = calculatePlayerStats(player)
+    csv += `${playerStats.jerseyNumber},${playerStats.name},${playerStats.PTS},${playerStats.FGM},${playerStats.FGA},${playerStats.FGP},${playerStats.TPM},${playerStats.TPA},${playerStats.TPP},${playerStats.FTM},${playerStats.FTA},${playerStats.FTP},${playerStats.OREB},${playerStats.DREB},${playerStats.REB},${playerStats.AST},${playerStats.STL},${playerStats.BLK},${playerStats.TO},${playerStats.PF}\n`
   })
 
   const blob = new Blob([csv], { type: 'text/csv' })
@@ -436,24 +416,167 @@ export function exportCSV() {
   URL.revokeObjectURL(url)
 }
 
+// Validate imported game data for security
+function validateImportedGame(importedGame) {
+  // Check required top-level fields
+  if (!importedGame.gameId || typeof importedGame.gameId !== 'string') {
+    return { valid: false, error: 'Missing or invalid gameId' }
+  }
+  if (!importedGame.homeTeam || typeof importedGame.homeTeam !== 'string') {
+    return { valid: false, error: 'Missing or invalid homeTeam' }
+  }
+  if (!importedGame.oppositionTeam || typeof importedGame.oppositionTeam !== 'string') {
+    return { valid: false, error: 'Missing or invalid oppositionTeam' }
+  }
+  if (typeof importedGame.oppositionScore !== 'number' || importedGame.oppositionScore < 0) {
+    return { valid: false, error: 'Invalid oppositionScore' }
+  }
+
+  // Validate players array
+  if (!Array.isArray(importedGame.players)) {
+    return { valid: false, error: 'Players must be an array' }
+  }
+  if (importedGame.players.length === 0 || importedGame.players.length > 12) {
+    return { valid: false, error: 'Player count must be between 1 and 12' }
+  }
+
+  // Validate each player
+  const playerIds = new Set()
+  const jerseyNumbers = new Set()
+  for (const player of importedGame.players) {
+    if (!player.playerId || typeof player.playerId !== 'string') {
+      return { valid: false, error: 'Invalid player ID' }
+    }
+    if (playerIds.has(player.playerId)) {
+      return { valid: false, error: 'Duplicate player ID found' }
+    }
+    playerIds.add(player.playerId)
+
+    if (typeof player.jerseyNumber !== 'number' || player.jerseyNumber < 0 || player.jerseyNumber > 99) {
+      return { valid: false, error: 'Jersey number must be between 0 and 99' }
+    }
+    if (jerseyNumbers.has(player.jerseyNumber)) {
+      return { valid: false, error: 'Duplicate jersey number found' }
+    }
+    jerseyNumbers.add(player.jerseyNumber)
+
+    if (!player.name || typeof player.name !== 'string' || player.name.trim().length === 0) {
+      return { valid: false, error: 'Invalid player name' }
+    }
+    if (typeof player.totalPoints !== 'number' || player.totalPoints < 0) {
+      return { valid: false, error: 'Invalid totalPoints' }
+    }
+    if (typeof player.totalFouls !== 'number' || player.totalFouls < 0) {
+      return { valid: false, error: 'Invalid totalFouls' }
+    }
+    if (!Array.isArray(player.statistics)) {
+      return { valid: false, error: 'Player statistics must be an array' }
+    }
+    if (player.statistics.length > 1000) {
+      return { valid: false, error: 'Too many player statistics (max 1000 per player)' }
+    }
+  }
+
+  // Validate quarters array
+  if (!Array.isArray(importedGame.quarters)) {
+    return { valid: false, error: 'Quarters must be an array' }
+  }
+  if (importedGame.quarters.length === 0) {
+    return { valid: false, error: 'At least one quarter required' }
+  }
+
+  // Validate each quarter
+  const quarterIds = new Set()
+  const validStatTypes = Object.values(StatType)
+
+  for (const quarter of importedGame.quarters) {
+    if (!quarter.quarterId || typeof quarter.quarterId !== 'string') {
+      return { valid: false, error: 'Invalid quarter ID' }
+    }
+    if (quarterIds.has(quarter.quarterId)) {
+      return { valid: false, error: 'Duplicate quarter ID found' }
+    }
+    quarterIds.add(quarter.quarterId)
+
+    if (!quarter.quarterName || typeof quarter.quarterName !== 'string') {
+      return { valid: false, error: 'Invalid quarter name' }
+    }
+    if (!Array.isArray(quarter.statistics)) {
+      return { valid: false, error: 'Quarter statistics must be an array' }
+    }
+    if (quarter.statistics.length > 1000) {
+      return { valid: false, error: 'Too many quarter statistics (max 1000 per quarter)' }
+    }
+
+    // Validate statistics events
+    for (const stat of quarter.statistics) {
+      if (!stat.eventId || typeof stat.eventId !== 'string') {
+        return { valid: false, error: 'Invalid event ID in statistics' }
+      }
+      if (!playerIds.has(stat.playerId)) {
+        return { valid: false, error: 'Statistics reference non-existent player' }
+      }
+      if (!quarterIds.has(stat.quarterId)) {
+        return { valid: false, error: 'Statistics reference invalid quarter' }
+      }
+      if (!validStatTypes.includes(stat.statType)) {
+        return { valid: false, error: `Invalid stat type: ${stat.statType}` }
+      }
+      if (typeof stat.value !== 'number') {
+        return { valid: false, error: 'Stat value must be a number' }
+      }
+    }
+  }
+
+  // Validate current quarter
+  const validQuarterNames = importedGame.quarters.map(q => q.quarterName)
+  if (!validQuarterNames.includes(importedGame.currentQuarter)) {
+    return { valid: false, error: 'Current quarter does not exist in quarters list' }
+  }
+
+  // Validate history array
+  if (!Array.isArray(importedGame.history)) {
+    return { valid: false, error: 'History must be an array' }
+  }
+  if (importedGame.history.length > 2000) {
+    return { valid: false, error: 'Too many history entries (max 2000)' }
+  }
+
+  return { valid: true }
+}
+
 // Import game from JSON
 export function importGame(jsonData) {
   try {
     const importedGame = JSON.parse(jsonData)
 
-    // Validate imported data has required structure
-    if (!importedGame.gameId || !importedGame.players || !importedGame.quarters) {
-      return { success: false, message: 'Invalid game file format' }
+    // Comprehensive validation
+    const validation = validateImportedGame(importedGame)
+    if (!validation.valid) {
+      return { success: false, message: `Validation failed: ${validation.error}` }
     }
 
-    // Replace current game state with imported data
-    Object.assign(gameState, importedGame)
+    // Only assign validated properties (whitelist approach)
+    const validatedGame = {
+      gameId: importedGame.gameId,
+      homeTeam: importedGame.homeTeam,
+      oppositionTeam: importedGame.oppositionTeam,
+      date: importedGame.date,
+      oppositionScore: importedGame.oppositionScore,
+      quarters: importedGame.quarters,
+      players: importedGame.players,
+      currentQuarter: importedGame.currentQuarter,
+      overtimeCount: importedGame.overtimeCount || 0,
+      history: importedGame.history
+    }
+
+    Object.assign(gameState, validatedGame)
     saveGame()
 
     return { success: true, message: 'Game imported successfully' }
   } catch (error) {
     console.error('Error importing game:', error)
-    return { success: false, message: 'Failed to parse game file' }
+    return { success: false, message: 'Failed to parse game file. Please ensure it is valid JSON.' }
   }
 }
 

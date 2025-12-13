@@ -67,7 +67,8 @@
 
 <script>
 import { ref, computed, watch } from 'vue'
-import { gameState, StatType } from '../store/gameStore'
+import { gameState } from '../store/gameStore'
+import { calculatePlayerStats } from '../utils/statsCalculator'
 
 export default {
   name: 'BoxScore',
@@ -90,61 +91,10 @@ export default {
       emit('close')
     }
 
+    // Only compute stats when modal is visible to improve performance
     const playerStats = computed(() => {
-      return gameState.players.map(player => {
-        const stats = player.statistics
-
-        // Count each stat type
-        const twoMade = stats.filter(s => s.statType === StatType.TWO_PT_MADE).length
-        const twoMiss = stats.filter(s => s.statType === StatType.TWO_PT_MISS).length
-        const threeMade = stats.filter(s => s.statType === StatType.THREE_PT_MADE).length
-        const threeMiss = stats.filter(s => s.statType === StatType.THREE_PT_MISS).length
-        const ftMade = stats.filter(s => s.statType === StatType.FT_MADE).length
-        const ftMiss = stats.filter(s => s.statType === StatType.FT_MISS).length
-        const offReb = stats.filter(s => s.statType === StatType.OFF_REB).length
-        const defReb = stats.filter(s => s.statType === StatType.DEF_REB).length
-        const assists = stats.filter(s => s.statType === StatType.ASSIST).length
-        const steals = stats.filter(s => s.statType === StatType.STEAL).length
-        const blocks = stats.filter(s => s.statType === StatType.BLOCK).length
-        const turnovers = stats.filter(s => s.statType === StatType.TURNOVER).length
-
-        // Calculate derived stats
-        const FGM = twoMade + threeMade
-        const FGA = twoMade + twoMiss + threeMade + threeMiss
-        const FGP = FGA > 0 ? ((FGM / FGA) * 100).toFixed(1) + '%' : '0.0%'
-
-        const TPA = threeMade + threeMiss
-        const TPP = TPA > 0 ? ((threeMade / TPA) * 100).toFixed(1) + '%' : '0.0%'
-
-        const FTA = ftMade + ftMiss
-        const FTP = FTA > 0 ? ((ftMade / FTA) * 100).toFixed(1) + '%' : '0.0%'
-
-        const REB = offReb + defReb
-
-        return {
-          playerId: player.playerId,
-          jerseyNumber: player.jerseyNumber,
-          name: player.name,
-          PTS: player.totalPoints,
-          FGM: FGM,
-          FGA: FGA,
-          FGP: FGP,
-          TPM: threeMade,
-          TPA: TPA,
-          TPP: TPP,
-          FTM: ftMade,
-          FTA: FTA,
-          FTP: FTP,
-          OREB: offReb,
-          DREB: defReb,
-          REB: REB,
-          AST: assists,
-          STL: steals,
-          BLK: blocks,
-          TO: turnovers,
-          PF: player.totalFouls
-        }
-      })
+      if (!showModal.value) return []
+      return gameState.players.map(player => calculatePlayerStats(player))
     })
 
     return {

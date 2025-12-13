@@ -8,12 +8,12 @@
 
       <div class="modal-body">
         <div class="form-group">
-          <label for="jersey-number">Jersey Number (0-99)</label>
+          <label for="jersey-number">Jersey Number (1-99)</label>
           <input
             id="jersey-number"
             type="number"
             v-model.number="localJerseyNumber"
-            min="0"
+            min="1"
             max="99"
             class="form-input"
             ref="jerseyInput"
@@ -44,7 +44,7 @@
 
 <script>
 import { ref, onMounted } from 'vue'
-import { updatePlayer } from '../store/gameStore'
+import { updatePlayer, gameState } from '../store/gameStore'
 
 export default {
   name: 'PlayerEditModal',
@@ -69,22 +69,45 @@ export default {
     })
 
     function save() {
-      // Validate jersey number
-      if (localJerseyNumber.value < 0 || localJerseyNumber.value > 99) {
-        alert('Jersey number must be between 0 and 99')
+      // Validate jersey number range (1-99, not 0)
+      if (!Number.isInteger(localJerseyNumber.value) || localJerseyNumber.value < 1 || localJerseyNumber.value > 99) {
+        alert('Jersey number must be between 1 and 99')
+        return
+      }
+
+      // Check for duplicate jersey numbers (excluding current player)
+      const duplicateJersey = gameState.players.find(
+        p => p.playerId !== props.player.playerId && p.jerseyNumber === localJerseyNumber.value
+      )
+      if (duplicateJersey) {
+        alert(`Jersey number ${localJerseyNumber.value} is already used by ${duplicateJersey.name}`)
         return
       }
 
       // Validate player name
-      if (!localPlayerName.value || localPlayerName.value.trim() === '') {
+      const trimmedName = localPlayerName.value.trim()
+      if (!trimmedName) {
         alert('Player name cannot be empty')
+        return
+      }
+
+      // Validate name length
+      if (trimmedName.length > 20) {
+        alert('Player name cannot exceed 20 characters')
+        return
+      }
+
+      // Validate name characters (letters, numbers, spaces, hyphens, apostrophes only)
+      const namePattern = /^[a-zA-Z0-9\s'\-]+$/
+      if (!namePattern.test(trimmedName)) {
+        alert('Player name can only contain letters, numbers, spaces, hyphens, and apostrophes')
         return
       }
 
       // Update player in store
       updatePlayer(props.player.playerId, {
         jerseyNumber: localJerseyNumber.value,
-        name: localPlayerName.value.trim()
+        name: trimmedName
       })
 
       emit('save')

@@ -72,6 +72,28 @@ export default {
       const file = event.target.files[0]
       if (!file) return
 
+      // Security validation: file size limit (5MB)
+      const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB in bytes
+      if (file.size > MAX_FILE_SIZE) {
+        alert('File too large. Maximum size is 5MB.')
+        event.target.value = ''
+        return
+      }
+
+      // Security validation: MIME type
+      if (file.type && file.type !== 'application/json') {
+        alert('Invalid file type. Please select a JSON file.')
+        event.target.value = ''
+        return
+      }
+
+      // Security validation: file extension
+      if (!file.name.endsWith('.json')) {
+        alert('Invalid file extension. Please select a .json file.')
+        event.target.value = ''
+        return
+      }
+
       const reader = new FileReader()
       reader.onload = (e) => {
         const jsonData = e.target.result
@@ -80,10 +102,16 @@ export default {
         event.target.value = ''
       }
       reader.onerror = () => {
-        alert('Error reading file')
+        alert('Error reading file. Please try again.')
         event.target.value = ''
       }
-      reader.readAsText(file)
+
+      try {
+        reader.readAsText(file)
+      } catch (error) {
+        alert('Failed to read file.')
+        event.target.value = ''
+      }
     }
 
     function confirmReset() {
