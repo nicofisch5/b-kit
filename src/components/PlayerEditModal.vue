@@ -17,6 +17,7 @@
             max="99"
             class="form-input"
             ref="jerseyInput"
+            @keydown.enter="save"
           />
         </div>
 
@@ -28,6 +29,7 @@
             v-model="localPlayerName"
             maxlength="20"
             class="form-input"
+            @keydown.enter="save"
           />
         </div>
 

@@ -244,15 +244,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
-  max-height: 600px;
-  overflow-y: auto;
 }
 
 .player-card {
   display: flex;
   align-items: center;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  gap: var(--spacing-sm);
+  padding: var(--spacing-xs);
   background-color: var(--bg-card);
   border: 2px solid transparent;
   border-radius: var(--radius-md);
@@ -281,22 +279,22 @@ body {
 }
 
 .player-number {
-  font-size: 1.2rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--primary-color);
-  min-width: 50px;
+  min-width: 30px;
   transition: all var(--transition-fast);
 }
 
 .delete-icon-btn,
 .edit-icon-btn {
-  width: 32px;
-  height: 32px;
+  width: 24px;
+  height: 24px;
   border-radius: 50%;
   color: white;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -316,7 +314,7 @@ body {
 
 .delete-icon-btn .material-icons,
 .edit-icon-btn .material-icons {
-  font-size: 18px;
+  font-size: 14px;
   line-height: 1;
 }
 
@@ -331,18 +329,23 @@ body {
 
 .player-info {
   flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
 }
 
 .player-name {
+  font-size: 0.9rem;
   font-weight: 600;
-  margin-bottom: var(--spacing-xs);
   transition: all var(--transition-fast);
+  white-space: nowrap;
 }
 
 .player-stats {
   display: flex;
-  gap: var(--spacing-md);
-  font-size: 0.9rem;
+  gap: var(--spacing-xs);
+  font-size: 0.75rem;
+  margin-left: auto;
 }
 
 .stat-item {
@@ -1095,8 +1098,6 @@ body {
   .action-btn {
     padding: var(--spacing-sm) var(--spacing-md);
     font-size: 0.9rem;
-    flex: 1;
-    min-width: 0;
   }
 
   .btn-icon {
@@ -1170,10 +1171,6 @@ body {
 @media (max-width: 896px) and (orientation: landscape) {
   .main-content {
     grid-template-columns: 1fr 1.5fr;
-  }
-
-  .player-list {
-    max-height: 400px;
   }
 }
 
