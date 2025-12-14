@@ -23,8 +23,23 @@
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
 
-# Redirects for SPA
-# Note: Netlify automatically excludes /.netlify/functions/* and /api/* paths
+# API redirects to Netlify Functions
+[[redirects]]
+  from = "/api/track"
+  to = "/.netlify/functions/track"
+  status = 200
+
+[[redirects]]
+  from = "/api/analytics/summary"
+  to = "/.netlify/functions/analytics-summary"
+  status = 200
+
+[[redirects]]
+  from = "/api/analytics/export"
+  to = "/.netlify/functions/analytics-export"
+  status = 200
+
+# Redirects for SPA (must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"
