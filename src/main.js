@@ -2,8 +2,12 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
 import { registerSW } from 'virtual:pwa-register'
+import { trackAppLoad } from './utils/analytics'
 
 createApp(App).mount('#app')
+
+// Track app load (simple analytics)
+trackAppLoad().catch(err => console.warn('Analytics failed:', err))
 
 // Register service worker with update handling
 if ('serviceWorker' in navigator) {
