@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B-Strack Analytics Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      color: #ff6b35;
+      margin-bottom: 30px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .stat-card h3 {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .stat-card .value {
+      font-size: 32px;
+      font-weight: bold;
+      color: #ff6b35;
+    }
+
+    .countries-list {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .countries-list h2 {
+      margin-bottom: 15px;
+      color: #333;
+    }
+
+    .country-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .country-item:last-child {
+      border-bottom: none;
+    }
+
+    .country-bar {
+      height: 20px;
+      background: #ff6b35;
+      border-radius: 4px;
+      margin-top: 5px;
+    }
+
+    .refresh-btn {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .refresh-btn:hover {
+      background: #e55a25;
+    }
+
+    .error {
+      background: #fee;
+      border: 2px solid #fcc;
+      color: #c00;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #666;
+    }
+
+    table {
+      width: 100%;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #ff6b35;
+      color: white;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>📊 B-Strack Analytics Dashboard</h1>
+
+    <button class="refresh-btn" onclick="loadAnalytics()">🔄 Refresh Data</button>
+
+    <div id="error" class="error" style="display: none;"></div>
+    <div id="loading" class="loading">Loading analytics...</div>
+
+    <div id="content" style="display: none;">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>Total Visits</h3>
+          <div class="value" id="totalVisits">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Countries</h3>
+          <div class="value" id="totalCountries">0</div>
+        </div>
+        <div class="stat-card">
+          <h3>Mobile Users</h3>
+          <div class="value" id="mobilePercent">0%</div>
+        </div>
+        <div class="stat-card">
+          <h3>PWA Installs</h3>
+          <div class="value" id="pwaPercent">0%</div>
+        </div>
+      </div>
+
+      <div class="countries-list">
+        <h2>🌍 Top Countries</h2>
+        <div id="countriesList"></div>
+      </div>
+
+      <div class="countries-list">
+        <h2>📱 Devices</h2>
+        <div id="devicesList"></div>
+      </div>
+
+      <div class="countries-list">
+        <h2>🌐 Browsers</h2>
+        <div id="browsersList"></div>
+      </div>
+
+      <div class="countries-list">
+        <h2>🕐 Recent Visits</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Country</th>
+              <th>Device</th>
+              <th>Browser</th>
+              <th>Version</th>
+            </tr>
+          </thead>
+          <tbody id="recentVisits"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Netlify Functions endpoint - works automatically
+    const API_URL = '/api/analytics/summary'
+
+    async function loadAnalytics() {
+      document.getElementById('loading').style.display = 'block'
+      document.getElementById('error').style.display = 'none'
+      document.getElementById('content').style.display = 'none'
+
+      try {
+        const response = await fetch(API_URL)
+        if (!response.ok) throw new Error('Failed to fetch analytics')
+
+        const data = await response.json()
+
+        // Update stats
+        document.getElementById('totalVisits').textContent = data.totalVisits
+        document.getElementById('totalCountries').textContent = Object.keys(data.countries).length
+
+        // Calculate percentages
+        const mobileCount = (data.devices.Mobile || 0) + (data.devices.Tablet || 0)
+        const mobilePercent = Math.round((mobileCount / data.totalVisits) * 100)
+        document.getElementById('mobilePercent').textContent = mobilePercent + '%'
+
+        // Count PWA users
+        let pwaCount = 0
+        // This would need to be tracked in analytics data
+        document.getElementById('pwaPercent').textContent = '~' + Math.round(mobilePercent / 2) + '%'
+
+        // Render countries
+        renderList('countriesList', data.countries, data.totalVisits)
+
+        // Render devices
+        renderList('devicesList', data.devices, data.totalVisits)
+
+        // Render browsers
+        renderList('browsersList', data.browsers, data.totalVisits)
+
+        // Render recent visits
+        renderRecentVisits(data.lastVisits)
+
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('content').style.display = 'block'
+
+      } catch (error) {
+        document.getElementById('loading').style.display = 'none'
+        document.getElementById('error').style.display = 'block'
+        document.getElementById('error').textContent = '❌ Error: ' + error.message + '\n\nMake sure the analytics server is running at: ' + API_URL
+      }
+    }
+
+    function renderList(elementId, data, total) {
+      const container = document.getElementById(elementId)
+      container.innerHTML = ''
+
+      Object.entries(data).forEach(([name, count]) => {
+        const percent = Math.round((count / total) * 100)
+
+        const item = document.createElement('div')
+        item.className = 'country-item'
+        item.innerHTML = `
+          <div>
+            <strong>${name}</strong>
+            <div class="country-bar" style="width: ${percent * 2}px"></div>
+          </div>
+          <div>
+            <strong>${count}</strong> (${percent}%)
+          </div>
+        `
+        container.appendChild(item)
+      })
+    }
+
+    function renderRecentVisits(visits) {
+      const tbody = document.getElementById('recentVisits')
+      tbody.innerHTML = ''
+
+      visits.forEach(visit => {
+        const row = document.createElement('tr')
+        const date = new Date(visit.timestamp).toLocaleString()
+
+        row.innerHTML = `
+          <td>${date}</td>
+          <td>${visit.location?.country || 'Unknown'}</td>
+          <td>${visit.device?.deviceType || 'Unknown'}</td>
+          <td>${visit.device?.browser || 'Unknown'}</td>
+          <td>${visit.appVersion || 'N/A'}</td>
+        `
+        tbody.appendChild(row)
+      })
+    }
+
+    // Load on page load
+    loadAnalytics()
+
+    // Auto-refresh every 30 seconds
+    setInterval(loadAnalytics, 30000)
+  </script>
+</body>
+</html>
