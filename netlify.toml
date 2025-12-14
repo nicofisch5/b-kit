@@ -24,11 +24,11 @@
     Cache-Control = "public, max-age=31536000, immutable"
 
 # Redirects for SPA
+# Note: Netlify automatically excludes /.netlify/functions/* and /api/* paths
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  force = false
 
 # Environment variables (set these in Netlify UI)
 # NETLIFY_BLOBS_CONTEXT = production

@@ -1,6 +1,7 @@
 {
   "name": "b-strack",
   "version": "1.0.0",
+  "type": "module",
   "description": "B-Strack - Progressive Web App for tracking basketball game statistics",
   "main": "index.html",
   "scripts": {
