@@ -66,16 +66,16 @@ export default {
     ]
 
     const reboundingStats = [
-      { type: StatType.OFF_REB, label: 'Off Reb', class: 'neutral' },
-      { type: StatType.DEF_REB, label: 'Def Reb', class: 'neutral' }
+      { type: StatType.DEF_REB, label: 'Def Reb', class: 'neutral' },
+      { type: StatType.OFF_REB, label: 'Off Reb', class: 'neutral' }
     ]
 
     const playmakingStats = [
       { type: StatType.ASSIST, label: 'Assist', class: 'positive' },
       { type: StatType.STEAL, label: 'Steal', class: 'positive' },
       { type: StatType.BLOCK, label: 'Block', class: 'positive' },
-      { type: StatType.FOUL, label: 'Foul', class: 'negative' },
-      { type: StatType.TURNOVER, label: 'Turnover', class: 'negative' }
+      { type: StatType.TURNOVER, label: 'Turnover', class: 'negative' },
+      { type: StatType.FOUL, label: 'Foul', class: 'negative' }
     ]
 
     function handleStatClick(statType, label) {

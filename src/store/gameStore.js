@@ -11,7 +11,7 @@
  */
 
 import { reactive, watch } from 'vue'
-import { calculatePlayerStats } from '../utils/statsCalculator'
+import { calculatePlayerStats, calculateTeamTotals } from '../utils/statsCalculator'
 
 // Utility function to generate UUID
 function generateUUID() {
@@ -413,11 +413,17 @@ export function exportCSV() {
   // Box score format header
   let csv = '#,Name,PTS,FGM,FGA,FG%,3PM,3PA,3P%,FTM,FTA,FT%,OREB,DREB,REB,AST,STL,BLK,TO,PF\n'
 
+  // Calculate player stats
+  const allPlayerStats = gameState.players.map(player => calculatePlayerStats(player))
+
   // Add player data using shared stats calculator
-  gameState.players.forEach(player => {
-    const playerStats = calculatePlayerStats(player)
+  allPlayerStats.forEach(playerStats => {
     csv += `${playerStats.jerseyNumber},${playerStats.name},${playerStats.PTS},${playerStats.FGM},${playerStats.FGA},${playerStats.FGP},${playerStats.TPM},${playerStats.TPA},${playerStats.TPP},${playerStats.FTM},${playerStats.FTA},${playerStats.FTP},${playerStats.OREB},${playerStats.DREB},${playerStats.REB},${playerStats.AST},${playerStats.STL},${playerStats.BLK},${playerStats.TO},${playerStats.PF}\n`
   })
+
+  // Add team totals row
+  const teamTotals = calculateTeamTotals(allPlayerStats)
+  csv += `,${teamTotals.name},${teamTotals.PTS},${teamTotals.FGM},${teamTotals.FGA},${teamTotals.FGP},${teamTotals.TPM},${teamTotals.TPA},${teamTotals.TPP},${teamTotals.FTM},${teamTotals.FTA},${teamTotals.FTP},${teamTotals.OREB},${teamTotals.DREB},${teamTotals.REB},${teamTotals.AST},${teamTotals.STL},${teamTotals.BLK},${teamTotals.TO},${teamTotals.PF}\n`
 
   const blob = new Blob([csv], { type: 'text/csv' })
   const url = URL.createObjectURL(blob)

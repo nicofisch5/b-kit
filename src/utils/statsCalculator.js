@@ -103,3 +103,55 @@ export function calculatePlayerStats(player) {
     PF: player.totalFouls
   }
 }
+
+/**
+ * Calculate team totals from all player stats
+ * @param {Array} playerStats - Array of calculated player stats
+ * @returns {Object} Team totals
+ */
+export function calculateTeamTotals(playerStats) {
+  const totals = {
+    jerseyNumber: '',
+    name: 'TEAM TOTALS',
+    PTS: 0,
+    FGM: 0,
+    FGA: 0,
+    TPM: 0,
+    TPA: 0,
+    FTM: 0,
+    FTA: 0,
+    OREB: 0,
+    DREB: 0,
+    REB: 0,
+    AST: 0,
+    STL: 0,
+    BLK: 0,
+    TO: 0,
+    PF: 0
+  }
+
+  for (const player of playerStats) {
+    totals.PTS += player.PTS
+    totals.FGM += player.FGM
+    totals.FGA += player.FGA
+    totals.TPM += player.TPM
+    totals.TPA += player.TPA
+    totals.FTM += player.FTM
+    totals.FTA += player.FTA
+    totals.OREB += player.OREB
+    totals.DREB += player.DREB
+    totals.REB += player.REB
+    totals.AST += player.AST
+    totals.STL += player.STL
+    totals.BLK += player.BLK
+    totals.TO += player.TO
+    totals.PF += player.PF
+  }
+
+  // Calculate percentages
+  totals.FGP = totals.FGA > 0 ? ((totals.FGM / totals.FGA) * 100).toFixed(1) + '%' : '0.0%'
+  totals.TPP = totals.TPA > 0 ? ((totals.TPM / totals.TPA) * 100).toFixed(1) + '%' : '0.0%'
+  totals.FTP = totals.FTA > 0 ? ((totals.FTM / totals.FTA) * 100).toFixed(1) + '%' : '0.0%'
+
+  return totals
+}

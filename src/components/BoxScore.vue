@@ -61,6 +61,28 @@
                   <td>{{ player.TO }}</td>
                   <td>{{ player.PF }}</td>
                 </tr>
+                <tr v-if="teamTotals" class="totals-row">
+                  <td></td>
+                  <td class="player-name-col">{{ teamTotals.name }}</td>
+                  <td>{{ teamTotals.PTS }}</td>
+                  <td>{{ teamTotals.FGM }}</td>
+                  <td>{{ teamTotals.FGA }}</td>
+                  <td>{{ teamTotals.FGP }}</td>
+                  <td>{{ teamTotals.TPM }}</td>
+                  <td>{{ teamTotals.TPA }}</td>
+                  <td>{{ teamTotals.TPP }}</td>
+                  <td>{{ teamTotals.FTM }}</td>
+                  <td>{{ teamTotals.FTA }}</td>
+                  <td>{{ teamTotals.FTP }}</td>
+                  <td>{{ teamTotals.OREB }}</td>
+                  <td>{{ teamTotals.DREB }}</td>
+                  <td>{{ teamTotals.REB }}</td>
+                  <td>{{ teamTotals.AST }}</td>
+                  <td>{{ teamTotals.STL }}</td>
+                  <td>{{ teamTotals.BLK }}</td>
+                  <td>{{ teamTotals.TO }}</td>
+                  <td>{{ teamTotals.PF }}</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -73,7 +95,7 @@
 <script>
 import { ref, computed, watch } from 'vue'
 import { gameState } from '../store/gameStore'
-import { calculatePlayerStats } from '../utils/statsCalculator'
+import { calculatePlayerStats, calculateTeamTotals } from '../utils/statsCalculator'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
 
@@ -102,6 +124,11 @@ export default {
     const playerStats = computed(() => {
       if (!showModal.value) return []
       return gameState.players.map(player => calculatePlayerStats(player))
+    })
+
+    const teamTotals = computed(() => {
+      if (!showModal.value) return null
+      return calculateTeamTotals(playerStats.value)
     })
 
     function exportToPDF() {
@@ -153,6 +180,32 @@ export default {
         player.PF
       ])
 
+      // Add team totals row
+      if (teamTotals.value) {
+        data.push([
+          '',
+          teamTotals.value.name,
+          teamTotals.value.PTS,
+          teamTotals.value.FGM,
+          teamTotals.value.FGA,
+          teamTotals.value.FGP,
+          teamTotals.value.TPM,
+          teamTotals.value.TPA,
+          teamTotals.value.TPP,
+          teamTotals.value.FTM,
+          teamTotals.value.FTA,
+          teamTotals.value.FTP,
+          teamTotals.value.OREB,
+          teamTotals.value.DREB,
+          teamTotals.value.REB,
+          teamTotals.value.AST,
+          teamTotals.value.STL,
+          teamTotals.value.BLK,
+          teamTotals.value.TO,
+          teamTotals.value.PF
+        ])
+      }
+
       // Add table using autoTable
       autoTable(doc, {
         head: headers,
@@ -175,6 +228,13 @@ export default {
         },
         alternateRowStyles: {
           fillColor: [245, 245, 245]
+        },
+        didParseCell: function(data) {
+          // Style the totals row (last row)
+          if (data.row.index === playerStats.value.length) {
+            data.cell.styles.fontStyle = 'bold'
+            data.cell.styles.fillColor = [220, 220, 220]
+          }
         }
       })
 
@@ -202,6 +262,7 @@ export default {
       showModal,
       closeModal,
       playerStats,
+      teamTotals,
       exportToPDF
     }
   }
@@ -267,5 +328,20 @@ export default {
     font-size: 0.85rem;
     padding: var(--spacing-xs) var(--spacing-sm);
   }
+}
+
+.totals-row {
+  font-weight: bold;
+  background-color: #dcdcdc;
+  border-top: 2px solid #666;
+}
+
+.totals-row td {
+  font-weight: bold;
+}
+
+[data-theme="terminal"] .totals-row {
+  background-color: var(--highlight-bg);
+  border-top: 2px solid var(--border-color);
 }
 </style>
