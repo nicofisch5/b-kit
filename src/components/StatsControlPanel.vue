@@ -71,9 +71,9 @@ export default {
     ]
 
     const playmakingStats = [
-      { type: StatType.ASSIST, label: 'Assist', class: 'positive' },
       { type: StatType.STEAL, label: 'Steal', class: 'positive' },
       { type: StatType.BLOCK, label: 'Block', class: 'positive' },
+      { type: StatType.ASSIST, label: 'Assist', class: 'positive' },
       { type: StatType.TURNOVER, label: 'Turnover', class: 'negative' },
       { type: StatType.FOUL, label: 'Foul', class: 'negative' }
     ]
