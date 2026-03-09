@@ -12,6 +12,7 @@
 
 import { reactive, watch } from 'vue'
 import { calculatePlayerStats, calculateTeamTotals } from '../utils/statsCalculator'
+import * as apiSync from '../utils/apiSync'
 
 // Utility function to generate UUID
 function generateUUID() {
@@ -90,6 +91,9 @@ function loadGame() {
 // Create reactive game state
 export const gameState = reactive(loadGame())
 
+// On startup: ensure the game exists in the backend (fire-and-forget)
+apiSync.ensureGame(gameState)
+
 // Auto-save to localStorage (increased interval for better performance)
 let autoSaveTimer = null
 function scheduleAutoSave() {
@@ -147,15 +151,17 @@ export function switchQuarter(quarterName) {
       if (overtimeNum > gameState.overtimeCount) {
         gameState.overtimeCount = overtimeNum
       }
+      apiSync.addOvertimeQuarter(gameState.gameId)
     }
   }
 
   gameState.currentQuarter = quarterName
   saveGame()
+  apiSync.updateCurrentQuarter(gameState.gameId, quarterName)
 }
 
 // Record a stat event
-export function recordStat(playerId, statType, assistPlayerId = null) {
+export function recordStat(playerId, statType, assistPlayerId = null, _skipApiSync = false) {
   const player = gameState.players.find(p => p.playerId === playerId)
   if (!player) return false
 
@@ -201,7 +207,7 @@ export function recordStat(playerId, statType, assistPlayerId = null) {
 
   // Record assist if provided
   if (assistPlayerId && (statType === StatType.TWO_PT_MADE || statType === StatType.THREE_PT_MADE || statType === StatType.FT_MADE)) {
-    const assistEvent = recordStat(assistPlayerId, StatType.ASSIST)
+    const assistEvent = recordStat(assistPlayerId, StatType.ASSIST, null, true)
     if (assistEvent) {
       historyEntry.assistEvent = assistEvent
       historyEntry.assistPlayerId = assistPlayerId
@@ -211,6 +217,11 @@ export function recordStat(playerId, statType, assistPlayerId = null) {
   gameState.history.push(historyEntry)
 
   saveGame()
+
+  if (!_skipApiSync) {
+    apiSync.recordStat(gameState.gameId, playerId, quarter.quarterId, statType, assistPlayerId || null)
+  }
+
   return event
 }
 
@@ -274,6 +285,7 @@ export function undoLastAction() {
   }
 
   saveGame()
+  apiSync.undoLast(gameState.gameId)
   return true
 }
 
@@ -339,6 +351,7 @@ export function revertStatEvent(eventId) {
   }
 
   saveGame()
+  apiSync.revertEvent(gameState.gameId, eventId)
   return true
 }
 
@@ -346,6 +359,7 @@ export function revertStatEvent(eventId) {
 export function updateOppositionScore(score) {
   gameState.oppositionScore = Math.max(0, score)
   saveGame()
+  apiSync.updateScore(gameState.gameId, gameState.oppositionScore)
 }
 
 // Update player information
@@ -361,6 +375,7 @@ export function updatePlayer(playerId, updates) {
   }
 
   saveGame()
+  apiSync.updatePlayer(gameState.gameId, playerId, updates)
   return true
 }
 
@@ -387,6 +402,7 @@ export function deletePlayer(playerId) {
   gameState.history = gameState.history.filter(entry => entry.playerId !== playerId)
 
   saveGame()
+  apiSync.deletePlayer(gameState.gameId, playerId)
   return { success: true, message: 'Player deleted successfully.' }
 }
 
@@ -590,6 +606,7 @@ export function importGame(jsonData) {
 
     Object.assign(gameState, validatedGame)
     saveGame()
+    apiSync.syncFullGame(gameState)
 
     return { success: true, message: 'Game imported successfully' }
   } catch (error) {
@@ -631,6 +648,7 @@ export function resetGame(keepPlayers = false) {
 
   Object.assign(gameState, newGame)
   saveGame()
+  apiSync.syncFullGame(gameState)
 }
 
 // Get player statistics for current quarter

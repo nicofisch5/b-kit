@@ -66,5 +66,10 @@ export default defineConfig({
       }
     })
   ],
-  base: './'
+  base: './',
+  server: {
+    proxy: {
+      '/api/v1': 'http://localhost:8080'
+    }
+  }
 })

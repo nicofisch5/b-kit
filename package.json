@@ -12,7 +12,8 @@
   "dependencies": {
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
-    "vue": "^3.4.15"
+    "vue": "^3.4.15",
+    "vue-router": "^4.6.4"
   },
   "devDependencies": {
     "@netlify/blobs": "^10.4.3",

@@ -1,10 +1,13 @@
 import { createApp } from 'vue'
 import App from './App.vue'
+import router from './router'
 import './assets/main.css'
 import { registerSW } from 'virtual:pwa-register'
 import { trackAppLoad } from './utils/analytics'
 
-createApp(App).mount('#app')
+const app = createApp(App)
+app.use(router)
+app.mount('#app')
 
 // Track app load (simple analytics)
 trackAppLoad().catch(err => console.warn('Analytics failed:', err))
