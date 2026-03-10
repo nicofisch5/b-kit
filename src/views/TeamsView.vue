@@ -1,86 +1,180 @@
 <template>
-  <div class="placeholder-view">
-    <div class="placeholder-content">
-      <span class="placeholder-icon">&#128101;</span>
-      <h2 class="placeholder-title">Teams Management</h2>
-      <p class="placeholder-desc">Manage your teams, rosters, and player profiles.</p>
-      <span class="placeholder-badge">Coming soon</span>
+  <div class="app-container">
+    <div class="page-header">
+      <h1 class="page-title">Teams</h1>
+      <div class="page-header-actions">
+        <router-link :to="{ name: 'players', params: { orgSlug: $route.params.orgSlug } }" class="btn btn-secondary">All Players</router-link>
+        <button class="btn btn-primary" @click="showForm = true">+ New Team</button>
+      </div>
     </div>
+
+    <!-- Error -->
+    <div v-if="error" class="alert alert-error">{{ error }}</div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="loading-state">Loading teams…</div>
+
+    <!-- Empty -->
+    <div v-else-if="!loading && teams.length === 0 && !showForm" class="empty-state">
+      <span class="empty-icon">🏀</span>
+      <p>No teams yet. Create your first team!</p>
+    </div>
+
+    <!-- Team list grouped by category -->
+    <div v-else class="teams-grid">
+      <template v-for="category in categoriesInUse" :key="category">
+        <h2 class="category-heading">{{ category }}</h2>
+        <div class="team-cards">
+          <TeamCard
+            v-for="team in teamsByCategory[category]"
+            :key="team.id"
+            :team="team"
+            @click="goToTeam(team.id)"
+          />
+        </div>
+      </template>
+    </div>
+
+    <!-- Create form modal -->
+    <TeamFormModal
+      v-if="showForm"
+      @saved="onTeamSaved"
+      @cancel="showForm = false"
+    />
   </div>
 </template>
 
-<script>
-export default {
-  name: 'TeamsView'
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { teamService } from '../utils/teamService'
+import { TEAM_CATEGORIES } from '../utils/teamConstants'
+import TeamCard from '../components/TeamCard.vue'
+import TeamFormModal from '../components/TeamFormModal.vue'
+
+const router = useRouter()
+const route  = useRoute()
+
+const teams = ref([])
+const loading = ref(true)
+const error = ref(null)
+const showForm = ref(false)
+
+const categoriesInUse = computed(() => {
+  const set = new Set(teams.value.map(t => t.category))
+  return TEAM_CATEGORIES.filter(c => set.has(c))
+})
+
+const teamsByCategory = computed(() => {
+  const map = {}
+  for (const team of teams.value) {
+    if (!map[team.category]) map[team.category] = []
+    map[team.category].push(team)
+  }
+  return map
+})
+
+async function load() {
+  loading.value = true
+  error.value = null
+  try {
+    teams.value = await teamService.list()
+  } catch (e) {
+    error.value = e.message
+  } finally {
+    loading.value = false
+  }
 }
+
+function goToTeam(id) {
+  router.push({ name: 'team-detail', params: { orgSlug: route.params.orgSlug, teamId: id } })
+}
+
+function onTeamSaved(team) {
+  showForm.value = false
+  teams.value.push(team)
+}
+
+onMounted(load)
 </script>
 
 <style scoped>
-.placeholder-view {
+.page-header {
   display: flex;
-  justify-content: center;
   align-items: center;
-  min-height: 40vh;
-  padding: var(--spacing-xl);
+  justify-content: space-between;
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
 }
 
-.placeholder-content {
-  text-align: center;
-  padding: var(--spacing-xl);
-  background-color: var(--bg-light);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  max-width: 400px;
-  width: 100%;
+.page-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary-color);
 }
 
-.placeholder-icon {
-  font-size: 3rem;
-  display: block;
+.page-header-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.category-heading {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin: var(--spacing-lg) 0 var(--spacing-sm);
+}
+
+.team-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--spacing-md);
   margin-bottom: var(--spacing-md);
 }
 
-.placeholder-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--primary-color);
+.loading-state,
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--text-muted);
+}
+
+.empty-icon {
+  font-size: 2.5rem;
+  display: block;
   margin-bottom: var(--spacing-sm);
 }
 
-.placeholder-desc {
-  color: var(--text-muted);
+.alert-error {
+  background: #fdecea;
+  color: var(--error-color);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
   margin-bottom: var(--spacing-md);
 }
 
-.placeholder-badge {
-  display: inline-block;
-  background-color: var(--warning-color);
+.btn {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-primary {
+  background: var(--primary-color);
   color: white;
-  font-size: 0.85rem;
-  font-weight: 700;
-  padding: var(--spacing-xs) var(--spacing-md);
-  border-radius: var(--radius-sm);
 }
 
-[data-theme="terminal"] .placeholder-content {
-  border-radius: 0;
-  box-shadow: none;
-  border: 2px solid var(--border-color);
-  background-color: var(--bg-color);
-}
-
-[data-theme="terminal"] .placeholder-title {
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .placeholder-desc {
-  color: var(--text-color);
-}
-
-[data-theme="terminal"] .placeholder-badge {
-  border-radius: 0;
-  background-color: var(--bg-color);
-  color: var(--text-color);
+.btn-secondary {
+  background: var(--bg-card);
+  color: var(--text-light);
   border: 1px solid var(--border-color);
 }
 </style>

@@ -8,6 +8,7 @@ use App\Entity\Player;
 use App\Repository\GamePlayerRepository;
 use App\Repository\GameRepository;
 use App\Repository\PlayerRepository;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +26,7 @@ class GamePlayerController extends AbstractController
         private PlayerRepository $playerRepo,
         private GamePlayerRepository $gamePlayerRepo,
         private ValidatorInterface $validator,
+        private SecurityService $sec,
     ) {}
 
     #[Route('', methods: ['GET'])]
@@ -34,6 +36,7 @@ class GamePlayerController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $players = [];
         foreach ($game->getGamePlayers() as $gp) {
@@ -55,6 +58,7 @@ class GamePlayerController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $body = json_decode($request->getContent(), true) ?? [];
 
@@ -104,6 +108,7 @@ class GamePlayerController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $gamePlayer = null;
         foreach ($game->getGamePlayers() as $gp) {
@@ -151,6 +156,7 @@ class GamePlayerController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $count = $this->gamePlayerRepo->countByGame($gameId);
         if ($count <= 5) {

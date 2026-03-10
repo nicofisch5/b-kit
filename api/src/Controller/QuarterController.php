@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Quarter;
 use App\Repository\GameRepository;
 use App\Repository\QuarterRepository;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +19,7 @@ class QuarterController extends AbstractController
         private EntityManagerInterface $em,
         private GameRepository $gameRepo,
         private QuarterRepository $quarterRepo,
+        private SecurityService $sec,
     ) {}
 
     #[Route('', methods: ['GET'])]
@@ -27,6 +29,7 @@ class QuarterController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $quarters = [];
         foreach ($game->getQuarters() as $q) {
@@ -47,6 +50,7 @@ class QuarterController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $otCount = $game->getOvertimeCount() + 1;
         $quarterName = $otCount === 1 ? 'OT' : 'OT' . $otCount;
@@ -84,6 +88,7 @@ class QuarterController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $quarter = $this->quarterRepo->find($quarterId);
         if (!$quarter || $quarter->getGame()->getId() !== $gameId) {

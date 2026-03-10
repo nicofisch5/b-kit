@@ -19,7 +19,7 @@
       <h1 class="app-title">B-Strack</h1>
     </header>
 
-    <NavBar />
+    <NavBar v-if="showNav" />
 
     <router-view />
 
@@ -41,6 +41,8 @@ import UpdateNotification from './components/UpdateNotification.vue'
 import AutoSaveIndicator from './components/AutoSaveIndicator.vue'
 import NavBar from './components/NavBar.vue'
 import { version } from '../package.json'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 export default {
   name: 'App',
@@ -52,9 +54,12 @@ export default {
   },
   setup() {
     const appVersion = version
+    const route = useRoute()
+    const showNav = computed(() => !route.meta?.public)
 
     return {
-      appVersion
+      appVersion,
+      showNav,
     }
   }
 }

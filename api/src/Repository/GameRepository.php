@@ -20,7 +20,7 @@ class GameRepository extends ServiceEntityRepository
     /**
      * @return Game[]
      */
-    public function findFiltered(?GameStatus $status, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo, int $page = 1, int $limit = 20): array
+    public function findFiltered(?GameStatus $status, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo, int $page = 1, int $limit = 20, ?string $teamId = null, ?string $organizationId = null, ?array $gameTeamIds = null, ?array $gameChampIds = null): array
     {
         $qb = $this->createQueryBuilder('g')
             ->orderBy('g.date', 'DESC');
@@ -34,6 +34,24 @@ class GameRepository extends ServiceEntityRepository
         if ($dateTo !== null) {
             $qb->andWhere('g.date <= :dateTo')->setParameter('dateTo', $dateTo);
         }
+        if ($teamId !== null) {
+            $qb->andWhere('g.teamId = :teamId')->setParameter('teamId', $teamId);
+        }
+        if ($organizationId !== null) {
+            $qb->andWhere('g.organizationId = :orgId')->setParameter('orgId', $organizationId);
+        }
+        if ($gameTeamIds !== null || $gameChampIds !== null) {
+            $conditions = [];
+            if ($gameTeamIds !== null) {
+                $qb->setParameter('gameTeamIds', $gameTeamIds ?: ['__none__']);
+                $conditions[] = 'g.teamId IN (:gameTeamIds)';
+            }
+            if ($gameChampIds !== null) {
+                $qb->setParameter('gameChampIds', $gameChampIds ?: ['__none__']);
+                $conditions[] = 'g.championshipId IN (:gameChampIds)';
+            }
+            $qb->andWhere(implode(' OR ', $conditions));
+        }
 
         $qb->setFirstResult(($page - 1) * $limit)
            ->setMaxResults($limit);
@@ -41,7 +59,7 @@ class GameRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function countFiltered(?GameStatus $status, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo): int
+    public function countFiltered(?GameStatus $status, ?\DateTimeInterface $dateFrom, ?\DateTimeInterface $dateTo, ?string $teamId = null, ?string $organizationId = null, ?array $gameTeamIds = null, ?array $gameChampIds = null): int
     {
         $qb = $this->createQueryBuilder('g')
             ->select('COUNT(g.id)');
@@ -54,6 +72,24 @@ class GameRepository extends ServiceEntityRepository
         }
         if ($dateTo !== null) {
             $qb->andWhere('g.date <= :dateTo')->setParameter('dateTo', $dateTo);
+        }
+        if ($teamId !== null) {
+            $qb->andWhere('g.teamId = :teamId')->setParameter('teamId', $teamId);
+        }
+        if ($organizationId !== null) {
+            $qb->andWhere('g.organizationId = :orgId')->setParameter('orgId', $organizationId);
+        }
+        if ($gameTeamIds !== null || $gameChampIds !== null) {
+            $conditions = [];
+            if ($gameTeamIds !== null) {
+                $qb->setParameter('gameTeamIds', $gameTeamIds ?: ['__none__']);
+                $conditions[] = 'g.teamId IN (:gameTeamIds)';
+            }
+            if ($gameChampIds !== null) {
+                $qb->setParameter('gameChampIds', $gameChampIds ?: ['__none__']);
+                $conditions[] = 'g.championshipId IN (:gameChampIds)';
+            }
+            $qb->andWhere(implode(' OR ', $conditions));
         }
 
         return (int) $qb->getQuery()->getSingleScalarResult();

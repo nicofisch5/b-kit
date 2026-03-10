@@ -1,5 +1,8 @@
 <template>
   <div class="game-view">
+    <div class="tracker-nav">
+      <router-link :to="{ name: 'games', params: { orgSlug: $route.params.orgSlug } }" class="back-link">← Games</router-link>
+    </div>
     <ScoreDisplay />
     <QuarterSelector />
 
@@ -219,3 +222,18 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+.tracker-nav {
+  margin-bottom: var(--spacing-sm);
+}
+.back-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.back-link:hover {
+  color: var(--primary-color);
+}
+</style>

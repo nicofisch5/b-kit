@@ -275,6 +275,186 @@ To add new statistics:
 2. Update the recording logic in `recordStat()` function
 3. Add buttons to `StatsControlPanel.vue`
 
+## Backend (Symfony API + Docker)
+
+The backend is a Symfony 7.1 REST API running in Docker. All commands below are run from the **repo root**.
+
+### Services
+
+| Service  | URL / Port              | Description            |
+|----------|-------------------------|------------------------|
+| API      | http://localhost:8080   | Nginx + PHP-FPM        |
+| MariaDB  | localhost:3307          | Database               |
+| Adminer  | http://localhost:8081   | DB web UI              |
+
+Adminer login: server=`database`, user=`bkit`, password=`bkit_secret`.
+
+### Start / Stop
+
+```bash
+# Start all services (detached)
+docker-compose up -d
+
+# Stop all services
+docker-compose down
+
+# Rebuild PHP image (after Dockerfile changes)
+docker-compose up -d --build php
+
+# View logs
+docker-compose logs -f
+docker-compose logs -f php
+docker-compose logs -f nginx
+docker-compose logs -f database
+```
+
+### Database Migrations
+
+```bash
+# Run pending migrations
+docker-compose exec php php bin/console doctrine:migrations:migrate
+
+# Check migration status
+docker-compose exec php php bin/console doctrine:migrations:status
+
+# Generate a new migration from entity changes
+docker-compose exec php php bin/console doctrine:migrations:diff
+```
+
+### Useful Symfony Commands
+
+```bash
+# Open a shell in the PHP container
+docker-compose exec php bash
+
+# Clear Symfony cache
+docker-compose exec php php bin/console cache:clear
+
+# List all registered routes
+docker-compose exec php php bin/console debug:router
+
+# Seed SuperAdmin user (first-time setup)
+docker-compose exec php php bin/console app:create-super-admin
+```
+
+### JWT Keys (one-time setup)
+
+```bash
+docker-compose exec php php bin/console lexik:jwt:generate-keypair
+# Passphrase: bkit_jwt_passphrase
+```
+
+### Running Backend Tests (PHPUnit 12)
+
+Tests run against an isolated `bkit_test` database.
+
+**First-time test database setup:**
+
+```bash
+# Create the test database
+docker-compose exec php bash -c \
+  'mysql -h database -u bkit -pbkit_secret -e "CREATE DATABASE IF NOT EXISTS bkit_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"'
+
+# Clear test cache
+docker-compose exec php bash -c 'APP_ENV=test php bin/console cache:clear'
+
+# Run migrations on the test database
+docker-compose exec php bash -c \
+  'DATABASE_URL="mysql://bkit:bkit_secret@database:3306/bkit_test?serverVersion=10.11.0-MariaDB" \
+   APP_ENV=test php bin/console doctrine:migrations:migrate --no-interaction'
+```
+
+**Running tests:**
+
+```bash
+# Run all tests
+docker-compose exec php php vendor/bin/phpunit --testdox
+
+# Run only unit tests
+docker-compose exec php php vendor/bin/phpunit --testsuite unit --testdox
+
+# Run only functional tests
+docker-compose exec php php vendor/bin/phpunit --testsuite functional --testdox
+
+# Run a specific test class
+docker-compose exec php php vendor/bin/phpunit tests/Functional/PlayerControllerTest.php --testdox
+```
+
+### Running Frontend Tests (Vitest)
+
+```bash
+# Run all frontend unit tests once
+npm test
+
+# Run in watch mode (re-runs on file changes)
+npm run test:watch
+```
+
+---
+
+## Security
+
+### Authentication
+
+- **JWT (RS256)** — all API routes under `/api/v1` (except `/auth/login`) require a valid Bearer token.
+  - Signed with an RSA private/public key pair. The frontend only holds the public key and cannot forge tokens.
+  - Token TTL is configurable via the `JWT_TTL` environment variable.
+  - The JWT payload carries `userId`, `role`, `organizationId`, and `organizationSlug` — no extra DB lookup needed per request.
+- **Login throttling** — max 5 failed attempts per IP per 15 minutes (Symfony built-in `login_throttling`).
+- **Password hashing** — `argon2id` via Symfony's `algorithm: auto` (PHP 8 default).
+- **Stateless firewalls** — no session cookies, no CSRF surface.
+- **Role hierarchy** — `ROLE_SUPER_ADMIN` > `ROLE_ADMIN` > `ROLE_COACH`. The `/admin/*` subtree is locked at the firewall level to `ROLE_SUPER_ADMIN` before controllers run.
+
+### Authorization (inside controllers)
+
+All controller actions use a shared `SecurityService` that enforces fine-grained access:
+
+| Check | Behaviour |
+|---|---|
+| `getOrgFilter()` | List queries always scoped to the caller's `organization_id`. SuperAdmin sees all. |
+| `assertSameOrg()` | Show / update / delete verify the resource belongs to the caller's org (403 otherwise). |
+| `assertCanAccessTeam()` | Admins: same org. Coaches: must be explicitly assigned via `coach_team`. |
+| `assertCanAccessChampionship()` | Admins: same org. Coaches: must be explicitly assigned via `coach_championship`. |
+| `assertCanAccessGame()` | Admins: same org. Coaches: game's linked team or championship must be assigned. |
+
+Coach team and championship IDs are cached per request to avoid redundant DB calls.
+
+### Vue → Symfony Communication
+
+- There is **no API key** identifying the Vue app as a client. API keys embedded in browser code are visible in DevTools and provide no real security — JWT per user is the correct model here.
+- Every request from `apiClient.js` attaches `Authorization: Bearer <token>` from `authStore`.
+- On any `401` response the token is cleared from memory and `localStorage`, and the router redirects to `/login`.
+- In development, Vite proxies `/api/v1` → `http://localhost:8080`, so the browser makes same-origin requests and CORS is not involved.
+
+### CORS (production)
+
+- Configured via `nelmio/cors-bundle`. Only the origin in `CORS_ALLOW_ORIGIN` is allowed (regex-based — scope it to your Netlify domain in production).
+- Allowed methods: `GET POST PUT DELETE OPTIONS`. Allowed headers: `Content-Type`, `Authorization`.
+- CORS is enforced by the browser, not the server. Non-browser clients (curl, Postman) bypass it — JWT is the actual enforcement layer.
+
+### Nginx Security Headers (API server)
+
+| Header | Value |
+|---|---|
+| `X-Content-Type-Options` | `nosniff` |
+| `X-Frame-Options` | `DENY` |
+| `X-XSS-Protection` | `1; mode=block` |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` |
+| `Permissions-Policy` | geolocation, microphone, camera all denied |
+
+Direct `.php` file access returns 404 — only `index.php` through FastCGI is reachable.
+
+### Known Gaps / Production Checklist
+
+| Item | Notes |
+|---|---|
+| **HTTPS** | Not enforced at the Docker layer. TLS must be handled by your production reverse proxy or CDN. |
+| **JWT in `localStorage`** | Accessible to JS. Acceptable for a PWA; an `HttpOnly` cookie would be stronger against XSS. |
+| **No token revocation** | A JWT is valid until it expires — there is no server-side blacklist. |
+| **`CORS_ALLOW_ORIGIN`** | Must be set to your exact production domain. A wildcard (`*`) breaks the CORS protection entirely. |
+
+---
+
 ## Technical Stack
 
 - **Framework**: Vue.js 3 (Composition API)

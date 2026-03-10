@@ -8,6 +8,7 @@ use App\Repository\GameRepository;
 use App\Repository\PlayerRepository;
 use App\Repository\QuarterRepository;
 use App\Repository\StatEventRepository;
+use App\Service\SecurityService;
 use App\Service\StatRecorderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +29,7 @@ class StatEventController extends AbstractController
         private StatEventRepository $statEventRepo,
         private StatRecorderService $statRecorder,
         private ValidatorInterface $validator,
+        private SecurityService $sec,
     ) {}
 
     #[Route('', methods: ['GET'])]
@@ -37,6 +39,7 @@ class StatEventController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $playerId = $request->query->get('playerId');
         $quarterId = $request->query->get('quarterId');
@@ -65,6 +68,7 @@ class StatEventController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $body = json_decode($request->getContent(), true) ?? [];
 
@@ -134,6 +138,7 @@ class StatEventController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $event = $this->statEventRepo->find($eventId);
         if (!$event || $event->getGame()->getId() !== $gameId) {

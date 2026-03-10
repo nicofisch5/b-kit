@@ -10,6 +10,7 @@ use App\Entity\Player;
 use App\Entity\Quarter;
 use App\Enum\GameStatus;
 use App\Repository\GameRepository;
+use App\Service\SecurityService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,6 +26,7 @@ class GameController extends AbstractController
         private EntityManagerInterface $em,
         private GameRepository $gameRepo,
         private ValidatorInterface $validator,
+        private SecurityService $sec,
     ) {}
 
     #[Route('', methods: ['GET'])]
@@ -33,6 +35,7 @@ class GameController extends AbstractController
         $status = $request->query->get('status');
         $dateFrom = $request->query->get('dateFrom');
         $dateTo = $request->query->get('dateTo');
+        $teamId = $request->query->get('teamId') ?: null;
         $page = max(1, (int) $request->query->get('page', 1));
         $limit = min(100, max(1, (int) $request->query->get('limit', 20)));
 
@@ -40,11 +43,16 @@ class GameController extends AbstractController
         $dateFromDt = $dateFrom ? new \DateTime($dateFrom) : null;
         $dateToDt = $dateTo ? new \DateTime($dateTo) : null;
 
-        $games = $this->gameRepo->findFiltered($statusEnum, $dateFromDt, $dateToDt, $page, $limit);
-        $total = $this->gameRepo->countFiltered($statusEnum, $dateFromDt, $dateToDt);
+        $orgId = $this->sec->getOrgFilter();
+        $coachTeamIds = $this->sec->getCoachTeamIds();
+        $coachChampIds = $this->sec->getCoachChampionshipIds();
+        $games = $this->gameRepo->findFiltered($statusEnum, $dateFromDt, $dateToDt, $page, $limit, $teamId, $orgId, $coachTeamIds, $coachChampIds);
+        $total = $this->gameRepo->countFiltered($statusEnum, $dateFromDt, $dateToDt, $teamId, $orgId, $coachTeamIds, $coachChampIds);
 
         $data = array_map(fn(Game $g) => [
             'id' => $g->getId(),
+            'teamId' => $g->getTeamId(),
+            'championshipId' => $g->getChampionshipId(),
             'homeTeam' => $g->getHomeTeam(),
             'oppositionTeam' => $g->getOppositionTeam(),
             'date' => $g->getDate()->format('Y-m-d\TH:i:s'),
@@ -78,9 +86,17 @@ class GameController extends AbstractController
         }
 
         $game = new Game();
+        if (!empty($body['teamId'])) {
+            $game->setTeamId($body['teamId']);
+        }
+        $game->setOrganizationId($this->sec->requireOrg()->getId());
         $game->setHomeTeam($dto->homeTeam);
         $game->setOppositionTeam($dto->oppositionTeam);
-        $game->setDate(new \DateTime($dto->date));
+        try {
+            $game->setDate(new \DateTime($dto->date));
+        } catch (\Exception) {
+            return $this->json(['error' => 'Invalid date format'], Response::HTTP_BAD_REQUEST);
+        }
         $game->setOppositionScore($dto->oppositionScore);
         $this->em->persist($game);
 
@@ -123,6 +139,7 @@ class GameController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         return $this->json(['data' => GameDetailResponse::fromEntity($game)]);
     }
@@ -134,6 +151,7 @@ class GameController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $body = json_decode($request->getContent(), true) ?? [];
 
@@ -144,7 +162,11 @@ class GameController extends AbstractController
             $game->setOppositionTeam($body['oppositionTeam']);
         }
         if (isset($body['date'])) {
-            $game->setDate(new \DateTime($body['date']));
+            try {
+                $game->setDate(new \DateTime($body['date']));
+            } catch (\Exception) {
+                return $this->json(['error' => 'Invalid date format'], Response::HTTP_BAD_REQUEST);
+            }
         }
         if (isset($body['oppositionScore'])) {
             $game->setOppositionScore((int) $body['oppositionScore']);
@@ -165,6 +187,7 @@ class GameController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $this->em->remove($game);
         $this->em->flush();
@@ -179,6 +202,7 @@ class GameController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $game->setStatus(GameStatus::COMPLETED);
         $this->em->flush();

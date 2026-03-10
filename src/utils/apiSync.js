@@ -6,11 +6,15 @@
  * The backend is seeded with local UUIDs so all IDs stay consistent.
  */
 
+import { authStore } from '../store/authStore'
+
 const BASE_URL = '/api/v1'
 
 async function call(method, path, body = null) {
   try {
-    const opts = { method, headers: { 'Content-Type': 'application/json' } }
+    const headers = { 'Content-Type': 'application/json' }
+    if (authStore.token) headers['Authorization'] = `Bearer ${authStore.token}`
+    const opts = { method, headers }
     if (body) opts.body = JSON.stringify(body)
     const res = await fetch(BASE_URL + path, opts)
     if (!res.ok) {
@@ -71,6 +75,7 @@ function buildImportPayload(gs) {
   return {
     game: {
       id: gs.gameId,
+      teamId: gs.teamId || null,
       homeTeam: gs.homeTeam,
       oppositionTeam: gs.oppositionTeam,
       date: gs.date,

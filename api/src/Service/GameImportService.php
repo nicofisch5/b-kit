@@ -18,14 +18,18 @@ class GameImportService
         private EntityManagerInterface $em,
     ) {}
 
-    public function import(array $data): Game
+    public function import(array $data, ?string $organizationId = null): Game
     {
-        return $this->em->wrapInTransaction(function () use ($data) {
+        return $this->em->wrapInTransaction(function () use ($data, $organizationId) {
             $gameData = $data['game'];
 
             $game = new Game();
             if (isset($gameData['id'])) {
                 $game->setId($gameData['id']);
+            }
+            $game->setTeamId($gameData['teamId'] ?? null);
+            if ($organizationId !== null) {
+                $game->setOrganizationId($organizationId);
             }
             $game->setHomeTeam($gameData['homeTeam']);
             $game->setOppositionTeam($gameData['oppositionTeam']);

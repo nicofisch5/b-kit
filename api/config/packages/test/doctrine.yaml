@@ -1,0 +1,3 @@
+doctrine:
+    dbal:
+        url: 'mysql://bkit:bkit_secret@database:3306/bkit_test?serverVersion=10.11.0-MariaDB&charset=utf8mb4'

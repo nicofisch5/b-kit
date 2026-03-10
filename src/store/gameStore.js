@@ -76,6 +76,7 @@ function loadGame() {
 
   return {
     gameId: generateUUID(),
+    teamId: null,
     homeTeam: 'Home Team',
     oppositionTeam: 'Opposition',
     date: new Date().toISOString(),
@@ -613,6 +614,26 @@ export function importGame(jsonData) {
     console.error('Error importing game:', error)
     return { success: false, message: 'Failed to parse game file. Please ensure it is valid JSON.' }
   }
+}
+
+// Start a new game with full options (used by NewGameModal)
+export function startNewGame({ homeTeam, oppositionTeam, date, teamId, players } = {}) {
+  const newGame = {
+    gameId: generateUUID(),
+    teamId: teamId || null,
+    homeTeam: homeTeam || 'Home Team',
+    oppositionTeam: oppositionTeam || 'Opposition',
+    date: date || new Date().toISOString(),
+    oppositionScore: 0,
+    quarters: createDefaultQuarters(),
+    players: players || createDefaultPlayers(),
+    currentQuarter: 'Q1',
+    overtimeCount: 0,
+    history: []
+  }
+  Object.assign(gameState, newGame)
+  saveGame()
+  apiSync.syncFullGame(gameState)
 }
 
 // Reset game

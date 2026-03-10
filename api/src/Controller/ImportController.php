@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\DTO\Response\GameDetailResponse;
 use App\Service\GameImportService;
+use App\Service\SecurityService;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -14,6 +16,8 @@ class ImportController extends AbstractController
 {
     public function __construct(
         private GameImportService $importService,
+        private SecurityService $sec,
+        private LoggerInterface $logger,
     ) {}
 
     #[Route('/api/v1/games/import', methods: ['POST'])]
@@ -30,10 +34,12 @@ class ImportController extends AbstractController
             return $this->json(['error' => $errors], Response::HTTP_BAD_REQUEST);
         }
 
+        $orgId = $this->sec->getOrgFilter(); // null for SuperAdmin (keeps existing org from payload)
         try {
-            $game = $this->importService->import($data);
+            $game = $this->importService->import($data, $orgId);
         } catch (\Exception $e) {
-            return $this->json(['error' => 'Import failed: ' . $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            $this->logger->error('Game import failed', ['exception' => $e]);
+            return $this->json(['error' => 'Import failed. Please check the file and try again.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         return $this->json(

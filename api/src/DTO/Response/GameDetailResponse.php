@@ -7,6 +7,8 @@ use App\Entity\Game;
 class GameDetailResponse
 {
     public string $id;
+    public ?string $teamId;
+    public ?string $championshipId;
     public string $homeTeam;
     public string $oppositionTeam;
     public string $date;
@@ -23,6 +25,8 @@ class GameDetailResponse
     {
         $dto = new self();
         $dto->id = $game->getId();
+        $dto->teamId = $game->getTeamId();
+        $dto->championshipId = $game->getChampionshipId();
         $dto->homeTeam = $game->getHomeTeam();
         $dto->oppositionTeam = $game->getOppositionTeam();
         $dto->date = $game->getDate()->format('Y-m-d\TH:i:s');

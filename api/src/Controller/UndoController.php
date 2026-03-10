@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\GameHistoryRepository;
 use App\Repository\GameRepository;
+use App\Service\SecurityService;
 use App\Service\UndoService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +19,7 @@ class UndoController extends AbstractController
         private GameRepository $gameRepo,
         private GameHistoryRepository $historyRepo,
         private UndoService $undoService,
+        private SecurityService $sec,
     ) {}
 
     #[Route('/undo', methods: ['POST'])]
@@ -27,6 +29,7 @@ class UndoController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $result = $this->undoService->undoLast($game);
 
@@ -44,6 +47,7 @@ class UndoController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $page = max(1, (int) $request->query->get('page', 1));
         $limit = min(100, max(1, (int) $request->query->get('limit', 20)));

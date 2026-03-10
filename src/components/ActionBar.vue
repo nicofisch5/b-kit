@@ -33,23 +33,35 @@
       style="display: none"
     />
 
-    <button class="action-btn reset-btn" @click="confirmReset">
+    <button class="action-btn reset-btn" @click="showNewGameModal = true">
       <span class="btn-icon">🔄</span>
       New Game
     </button>
   </div>
+
+  <NewGameModal
+    v-if="showNewGameModal"
+    @confirm="handleNewGame"
+    @cancel="showNewGameModal = false"
+  />
 </template>
 
 <script>
 import { ref } from 'vue'
-import { resetGame } from '../store/gameStore'
+import { useRouter } from 'vue-router'
+import { resetGame, startNewGame, gameState } from '../store/gameStore'
+import { authStore } from '../store/authStore'
+import NewGameModal from './NewGameModal.vue'
 
 export default {
   name: 'ActionBar',
-  emits: ['box-score', 'export', 'import'],
+  components: { NewGameModal },
+  emits: ['box-score', 'export', 'import', 'new-game'],
   setup(props, { emit }) {
+    const router = useRouter()
     const showExportMenu = ref(false)
     const fileInput = ref(null)
+    const showNewGameModal = ref(false)
 
     function handleBoxScore() {
       emit('box-score')
@@ -114,24 +126,37 @@ export default {
       }
     }
 
-    function confirmReset() {
-      if (confirm('Are you sure you want to start a new game? All statistics will be reset.')) {
-        // Ask if they want to keep the current players
-        const keepPlayers = confirm('Do you want to keep the current player names and numbers?\n\nClick OK to keep players, or Cancel to reset to default players.')
-        resetGame(keepPlayers)
-        alert('New game started!')
+    function handleNewGame({ homeTeam, oppositionTeam, date, teamId, rosterChoice, players }) {
+      if (rosterChoice === 'keep') {
+        // Keep current players, reset stats
+        const keptPlayers = gameState.players.map(p => ({
+          playerId: p.playerId,
+          jerseyNumber: p.jerseyNumber,
+          name: p.name,
+          totalPoints: 0,
+          totalFouls: 0,
+          statistics: [],
+        }))
+        startNewGame({ homeTeam, oppositionTeam, date, teamId, players: keptPlayers })
+      } else {
+        // 'team' → players array from modal, 'fresh' → null (uses defaults)
+        startNewGame({ homeTeam, oppositionTeam, date, teamId, players: players?.length ? players : undefined })
       }
+      showNewGameModal.value = false
+      emit('new-game')
+      router.push({ name: 'game-tracker', params: { orgSlug: authStore.orgSlug } })
     }
 
     return {
       showExportMenu,
+      showNewGameModal,
       fileInput,
       handleBoxScore,
       toggleExportMenu,
       handleExport,
       triggerFileInput,
       handleFileSelect,
-      confirmReset
+      handleNewGame
     }
   }
 }

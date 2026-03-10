@@ -6,27 +6,25 @@
     </div>
 
     <div class="home-nav-cards">
-      <router-link to="/game" class="nav-card">
+      <router-link :to="{ name: 'games', params: { orgSlug: $route.params.orgSlug } }" class="nav-card">
         <span class="nav-card-icon">&#127936;</span>
         <h3 class="nav-card-title">Game Tracker</h3>
         <p class="nav-card-desc">Track live game stats, scores, and player performance</p>
       </router-link>
 
-      <router-link to="/teams" class="nav-card nav-card-soon">
+      <router-link :to="{ name: 'teams', params: { orgSlug: $route.params.orgSlug } }" class="nav-card">
         <span class="nav-card-icon">&#128101;</span>
         <h3 class="nav-card-title">Teams</h3>
         <p class="nav-card-desc">Manage your teams and rosters</p>
-        <span class="nav-card-badge">Coming soon</span>
       </router-link>
 
-      <router-link to="/seasons" class="nav-card nav-card-soon">
+      <router-link :to="{ name: 'seasons', params: { orgSlug: $route.params.orgSlug } }" class="nav-card">
         <span class="nav-card-icon">&#127942;</span>
         <h3 class="nav-card-title">Seasons</h3>
         <p class="nav-card-desc">Organize games into seasons and championships</p>
-        <span class="nav-card-badge">Coming soon</span>
       </router-link>
 
-      <router-link to="/stats" class="nav-card nav-card-soon">
+      <router-link :to="{ name: 'stats', params: { orgSlug: $route.params.orgSlug } }" class="nav-card nav-card-soon">
         <span class="nav-card-icon">&#128202;</span>
         <h3 class="nav-card-title">Cumulated Stats</h3>
         <p class="nav-card-desc">View aggregated statistics across games</p>
@@ -36,10 +34,7 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'HomeView'
-}
+<script setup>
 </script>
 
 <style scoped>

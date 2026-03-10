@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\GameRepository;
 use App\Service\GameExportService;
+use App\Service\SecurityService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,6 +16,7 @@ class ExportController extends AbstractController
     public function __construct(
         private GameRepository $gameRepo,
         private GameExportService $exportService,
+        private SecurityService $sec,
     ) {}
 
     #[Route('/api/v1/games/{gameId}/export', methods: ['GET'])]
@@ -24,6 +26,7 @@ class ExportController extends AbstractController
         if (!$game) {
             return $this->json(['error' => 'Game not found'], Response::HTTP_NOT_FOUND);
         }
+        $this->sec->assertCanAccessGame($game);
 
         $format = $request->query->get('format', 'json');
 

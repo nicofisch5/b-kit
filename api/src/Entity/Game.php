@@ -22,6 +22,9 @@ class Game
     private ?string $organizationId = null;
 
     #[ORM\Column(type: 'string', length: 36, nullable: true)]
+    private ?string $championshipId = null;
+
+    #[ORM\Column(type: 'string', length: 36, nullable: true)]
     private ?string $teamId = null;
 
     #[ORM\Column(type: 'string', length: 100)]
@@ -100,6 +103,9 @@ class Game
 
     public function getTeamId(): ?string { return $this->teamId; }
     public function setTeamId(?string $teamId): self { $this->teamId = $teamId; return $this; }
+
+    public function getChampionshipId(): ?string { return $this->championshipId; }
+    public function setChampionshipId(?string $championshipId): self { $this->championshipId = $championshipId; return $this; }
 
     public function getHomeTeam(): string { return $this->homeTeam; }
     public function setHomeTeam(string $homeTeam): self { $this->homeTeam = $homeTeam; return $this; }
